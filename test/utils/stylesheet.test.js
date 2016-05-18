@@ -435,11 +435,11 @@ html, body {
 test('buildStylesheetContent creates property textContent for a style tag, as well as selectorMap', (t) => {
   const stylesheetContent = buildStylesheetContent(FORMATTED_RULES, ID);
   const {
-    selectorMap,
-    textContent
+    css,
+    selectorMap
   } = stylesheetContent;
 
-  t.is(textContent, EXPECTED_RESULT);
+  t.is(css, EXPECTED_RESULT);
 
   t.deepEqual(selectorMap, {
     simple: HASHED_SIMPLE,

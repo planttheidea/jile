@@ -315,23 +315,23 @@ const buildStylesheetContent = (rules, styleId) => {
   const selectors = GET_OWN_PROPERTY_NAMES(rules);
 
   let selectorMap = {},
-      textContent = '';
+      css = '';
 
   selectors.forEach((selector) => {
     const rule = rules[selector];
 
     if (isKeyframes(selector)) {
-      textContent += getKeyframesBlock(selector, rule, selectorMap, styleId);
+      css += getKeyframesBlock(selector, rule, selectorMap, styleId);
     } else if (isMediaQuery(selector)) {
-      textContent += getMediaQueryBlock(selector, rule, selectorMap, styleId);
+      css += getMediaQueryBlock(selector, rule, selectorMap, styleId);
     } else {
-      textContent += getStandardBlock(selector, rule, selectorMap, styleId);
+      css += getStandardBlock(selector, rule, selectorMap, styleId);
     }
   });
   
   return {
-    selectorMap,
-    textContent
+    css,
+    selectorMap
   };
 };
 
@@ -347,11 +347,11 @@ const addStylesheetToHead = (styleId, rules) => {
   const stylesheetObject = buildStylesheetContent(rules, styleId);
   const existingStyle = document.querySelector(`#${styleId}`);
   const {
-    selectorMap,
-    textContent: buildTextContent
+    css,
+    selectorMap
   } = stylesheetObject;
 
-  const textContent = IS_PRODUCTION ? sqwish(buildTextContent) : buildTextContent;
+  const textContent = IS_PRODUCTION ? sqwish(css) : css;
 
   if (isElement(existingStyle)) {
     existingStyle.textContent = textContent;

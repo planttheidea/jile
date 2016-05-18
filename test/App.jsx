@@ -7,10 +7,13 @@ import {
 
 import jile from '../src';
 
-const styles = jile('app', {
+const styles = jile({
   'html, body': {
     margin: 0,
     padding: 0
+  },
+  '.selector': {
+    display: 'inline-block'
   },
   '.parent': {
     fontSize: 18,

@@ -99,7 +99,7 @@ test('standard method creates stylesheet with provided and generated IDs and add
 test('stylesOnly returns only the textContent for the styles and the selectorMap', (t) => {
   const stylesObject = jile.stylesOnly(ID, ORIGINAL_RULES);
 
-  t.is(stylesObject.textContent, EXPECTED_RESULT);
+  t.is(stylesObject.css, EXPECTED_RESULT);
   t.deepEqual(stylesObject.selectorMap, {
     test: HASHED_TEST
   });
