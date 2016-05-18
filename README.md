@@ -170,6 +170,23 @@ const styles = jile({
 ```
 Both will produce the same CSS.
 
+**Global selectors**
+
+Sometimes you want to mix your scoped styles with your global styles, and you can easily do that with the `:global()` wrapper.
+```
+const styles = jile({
+    ':global(.unhashed-selector).hashedSelector': {
+        display: 'block'
+    }
+});
+```
+With output:
+```
+.unhashed-selector.jile__hashedSelector__12527111 {
+    display: block;
+}
+```
+
 **Just the styles, Jack.**
 
 By default `jile` will inject a `<style>` tag into your `document`'s `<head>`, however if you are building a universal app and want to handle the injection yourself, `noInject` is a convenience function that will return an object with both the CSS and the selectorMap.
