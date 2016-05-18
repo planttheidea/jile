@@ -106,7 +106,7 @@ test('stylesOnly returns only the textContent for the styles and the selectorMap
 });
 
 const getCurrentStylesheetIds = () => {
-  const currentStylesheets = document.head.querySelectorAll('style');
+  const currentStylesheets = document.head.querySelectorAll('link[id],style[id]');
   return [...currentStylesheets].map(({id}) => {
     return id;
   });
@@ -114,6 +114,9 @@ const getCurrentStylesheetIds = () => {
 
 test('remove will remove stylesheet from the DOM', (t) => {
   const stylesheetIds = getCurrentStylesheetIds();
+
+  t.not(stylesheetIds.length, 0);
+
   const idsAfterFirstRemoval = stylesheetIds.slice(1, stylesheetIds.length);
 
   jile.remove(stylesheetIds[0]);

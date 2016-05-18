@@ -20,6 +20,12 @@ const styles = jile('app', {
       fontSize: 12
     },
 
+    '&::before': {
+      backgroundColor: '#fff',
+      content: '"I am a pseudo element! Weeeeee!"',
+      display: 'block'
+    },
+
     '& .crazyAnimation': {
       animation: '10s crazyStuff infinite',
       fontSize: 24,
@@ -88,11 +94,11 @@ class App extends Component {
         I am the parent
 
         <div className={styles.child}>
-          I am the child
+          I am the child that is bigger than the parent?
         </div>
 
         <div className={styles.crazyAnimation}>
-          I am crazy stuff
+          I am crazy animated stuffz. Look at me! Wooooo...
         </div>
       </div>
     );

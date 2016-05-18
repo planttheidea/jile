@@ -16,6 +16,9 @@ import {
 } from './regexps';
 import sqwish from './sqwish';
 
+const URL = window.URL || window.webkitURL;
+const hasBlobSupport = !!(window.Blob && typeof window.Blob === 'function' && URL.createObjectURL);
+
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const GET_OWN_PROPERTY_NAMES = Object.getOwnPropertyNames;
 const UNITLESS_VALUES = [
@@ -353,15 +356,30 @@ const addStylesheetToHead = (styleId, rules) => {
   if (isElement(existingStyle)) {
     existingStyle.textContent = textContent;
   } else {
-    let style = document.createElement('style');
+    if (!IS_PRODUCTION && hasBlobSupport) {
+      const blob = new window.Blob([textContent], {
+        type: 'text/css'
+      });
 
-    // old webkit hack
-    style.appendChild(document.createTextNode(''));
+      let link = document.createElement('link');
 
-    style.id = styleId;
-    style.textContent = textContent;
+      link.rel = 'stylesheet';
+      link.id = styleId;
+      link.href = URL.createObjectURL(blob);
 
-    document.head.appendChild(style);
+      document.head.appendChild(link);
+    } else {
+      let style = document.createElement('style');
+
+      // old webkit hack
+      style.appendChild(document.createTextNode(''));
+
+      style.id = styleId;
+      style.textContent = textContent;
+
+      document.head.appendChild(style);
+    }
+
   }
 
   return selectorMap;
