@@ -96,8 +96,8 @@ test('standard method creates stylesheet with provided and generated IDs and add
   });
 });
 
-test('stylesOnly returns only the textContent for the styles and the selectorMap', (t) => {
-  const stylesObject = jile.stylesOnly(ID, ORIGINAL_RULES);
+test('noInject returns only the textContent for the styles and the selectorMap', (t) => {
+  const stylesObject = jile.noInject(ID, ORIGINAL_RULES);
 
   t.is(stylesObject.css, EXPECTED_RESULT);
   t.deepEqual(stylesObject.selectorMap, {

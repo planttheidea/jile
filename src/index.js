@@ -41,7 +41,7 @@ const jile = (styleId, styles = {}) => {
  * @param {object} styles={}
  * @returns {{selectorMap: Object, textContent: string}}
  */
-jile.stylesOnly = (styleId, styles = {}) => {
+jile.noInject = (styleId, styles = {}) => {
   const rules = isObject(styleId) ? getRules(styleId, `jile-stylesheet-${++counter}`) : getRules(styles, styleId);
 
   return buildStylesheetContent(rules, styleId);
