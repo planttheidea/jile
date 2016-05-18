@@ -38,7 +38,7 @@ This example uses [React](https://github.com/facebook/react), but it you can use
 
 #### How it works
 
-Any styles that you declare in the object passed to the `jile` function are parsed, scoped, autoprefixed, and converted into valid CSS which is injected into the head of the document. Scoping entails hashing selectors (only ID and Class selectors will be hashed) so that you can use the same selector (such as `.container`) in many components without worrying about specificity or collision. The return from the `jile` function is a map of the selector names you provided to their respective hashed output names.
+Any styles that you declare in the object passed to the `jile` function are parsed, scoped, autoprefixed, and converted into CSS which is injected into the head of the document as a `<style>` tag. Scoping entails hashing selectors (only ID and Class selectors will be hashed) so that you can use the same selector (such as `.container`) in many components without worrying about specificity or collision. The return from the `jile` function is a map of the selector names you provided to their respective hashed output names.
 
 #### Why
 
