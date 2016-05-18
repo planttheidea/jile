@@ -47,7 +47,7 @@
     "modules"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/index.js",
   "name": "jile",
   "repository": {
     "type": "git",
