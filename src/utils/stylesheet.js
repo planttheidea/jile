@@ -391,6 +391,10 @@ const addStylesheetToHead = (styleId, rules) => {
  * @param {string} styleId
  */
 const removeStylesheetFromHead = (styleId) => {
+  if (!styleId) {
+    throw new Error('Must provide an ID for the jile to remove.');
+  }
+
   const matchingStyle = document.querySelector(`#${styleId}`);
 
   if (isElement(matchingStyle)) {
