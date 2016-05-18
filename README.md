@@ -34,7 +34,7 @@ With output of:
 </div>
 ```
 
-This example uses [React](https://github.com/facebook/react), but it you can use it with anything as it has no dependencies on a particular library.
+This example uses [React](https://github.com/facebook/react), but it you can use it with anything as it has no dependencies on a particular view library or framework.
 
 #### How it works
 
