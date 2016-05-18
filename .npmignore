@@ -1,0 +1,10 @@
+.idea
+dist
+node_modules
+src
+test
+.babelrc
+.eslintrc
+.gitignore
+.npmignore
+webpack.*.js
