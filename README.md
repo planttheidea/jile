@@ -170,6 +170,27 @@ const styles = jile({
 ```
 Both will produce the same CSS.
 
+`@font-face` declarations include a little magic, as the "bulletproof font face" rule requires a double-declaration of the `src` attribute.
+```
+const fontFaceStyles = jile({
+    '@font-face': {
+        fontFamily: 'WebFont',
+        src: 'url("webfont.eot?#iefix") format("embedded-opentype"), url("webfont.woff2") format("woff2"), ' +
+           'url("webfont.woff") format("woff"), url("webfont.ttf") format("truetype"), ' +
+           'url("webfont.svg#svgFontName") format("svg")'
+    }
+});
+```
+Creates the following output:
+```
+@font-face {
+    font-family: WebFont;
+    src: url("webfont.eot");
+    src: url("webfont.eot?#iefix") format("embedded-opentype"), url("webfont.woff2") format("woff2"), url("webfont.woff") format("woff"), url("webfont.ttf") format("truetype"), url("webfont.svg#svgFontName") format("svg");
+}
+```
+The injected `.eot` above the regular declaration is only if you provide an `.eot` in the provided object as one of the `src` values, as the injected declaration is for IE9 compat mode where as the `#iefix` declaration is for standard IE.
+
 **Global selectors**
 
 Sometimes you want to mix your scoped styles with your global styles, and you can easily do that with the `:global()` wrapper.
@@ -186,6 +207,26 @@ With output:
     display: block;
 }
 ```
+
+**Global stylesheets**
+
+You can create global stylesheets too! You get the same output, just minus the hashing.
+```
+const globalStyles = {
+    '.container': {
+        height: '100vh'
+    }
+};
+
+jile('global-styles', globalStyles, false);
+```
+Outputs:
+```
+.container {
+    height: 100vh;
+}
+```
+The boolean parameter `false` following the styles object tells jile not to hash any selectors.
 
 **Just the styles, Jack.**
 

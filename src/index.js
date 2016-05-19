@@ -21,15 +21,18 @@ let counter = -1;
  * tag
  *
  * @param {string|object} styleId
- * @param {object} styles={}
+ * @param {object|boolean} styles={}
+ * @param {boolean} shouldHashSelectors=true
  * @returns {object}
  */
-const jile = (styleId, styles = {}) => {
-  if (isObject(styleId)) {
-    return buildStylesheet(`jile-stylesheet-${++counter}`, styleId);
-  }
+const jile = (styleId, styles = {}, shouldHashSelectors = true) => {
+  const isStyleIdReallyStyles = isObject(styleId);
 
-  return buildStylesheet(styleId, styles);
+  const realStyleId = isStyleIdReallyStyles ? `jile-stylesheet-${++counter}` : styleId;
+  const realStyles = isStyleIdReallyStyles ? styleId : styles;
+  const realShouldHashSelectors = isStyleIdReallyStyles ? !!styles : shouldHashSelectors;
+
+  return buildStylesheet(realStyleId, realStyles, realShouldHashSelectors);
 };
 
 /**
@@ -38,13 +41,20 @@ const jile = (styleId, styles = {}) => {
  * generation, where there is no document)
  *
  * @param {string|object} styleId
- * @param {object} styles={}
+ * @param {object|boolean} styles
+ * @param {boolean} shouldHashSelectors=true
  * @returns {{selectorMap: Object, textContent: string}}
  */
-jile.noInject = (styleId, styles = {}) => {
-  const rules = isObject(styleId) ? getRules(styleId, `jile-stylesheet-${++counter}`) : getRules(styles, styleId);
+jile.noInject = (styleId, styles, shouldHashSelectors = true) => {
+  const isStyleIdReallyStyles = isObject(styleId);
 
-  return buildStylesheetContent(rules, styleId);
+  const realStyleId = isStyleIdReallyStyles ? `jile-stylesheet-${++counter}` : styleId;
+  const realStyles = isStyleIdReallyStyles ? styleId : styles;
+  const realShouldHashSelectors = isStyleIdReallyStyles ? !!styles : shouldHashSelectors;
+
+  const rules = getRules(realStyles, realStyleId, realShouldHashSelectors);
+
+  return buildStylesheetContent(rules, realStyleId, realShouldHashSelectors);
 };
 
 /**

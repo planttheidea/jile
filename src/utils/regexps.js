@@ -1,4 +1,5 @@
 export const AT_SYMBOL_REGEXP = /@/;
+export const FONT_FACE_REGEXP = /@font-face/;
 export const GLOBAL_REPLACEMENT_REGEXP = /global__([0-9]+)/;
 export const GLOBAL_SELECTOR_REGEXP = /:global\((.*?)\)/;
 export const HASH_SELECTOR_REGEXP = /(\.|#)([_a-zA-Z][_a-zA-z0-9-]+)/g;
@@ -10,6 +11,7 @@ export const PAGE_REGEXP = /@page/;
 
 export default {
   AT_SYMBOL_REGEXP,
+  FONT_FACE_REGEXP,
   GLOBAL_REPLACEMENT_REGEXP,
   GLOBAL_SELECTOR_REGEXP,
   HASH_SELECTOR_REGEXP,

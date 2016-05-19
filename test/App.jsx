@@ -7,7 +7,13 @@ import {
 
 import jile from '../src';
 
-const styles = jile({
+const GLOBAL_STYLES = {
+  '.container': {
+    backgroundColor: 'yellow',
+    height: '100vh'
+  }
+};
+const SCOPED_STYLES = {
   'html, body': {
     margin: 0,
     padding: 0
@@ -87,21 +93,34 @@ const styles = jile({
 
   '@page :first': {
     'size': 'Letter landscape'
+  },
+
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
   }
-});
+};
+
+jile('universal-styles', GLOBAL_STYLES, false);
+
+const styles = jile(SCOPED_STYLES);
 
 class App extends Component {
   render() {
     return (
-      <div className={styles.parent}>
-        I am the parent
+      <div className="container">
+        <div className={styles.parent}>
+          I am the parent
 
-        <div className={styles.child}>
-          I am the child that is bigger than the parent?
-        </div>
+          <div className={styles.child}>
+            I am the child that is bigger than the parent?
+          </div>
 
-        <div className={styles.crazyAnimation}>
-          I am crazy animated stuffz. Look at me! Wooooo...
+          <div className={styles.crazyAnimation}>
+            I am crazy animated stuffz. Look at me! Wooooo...
+          </div>
         </div>
       </div>
     );

@@ -42,6 +42,12 @@ const SAMPLE_STYLE_OBJECT = {
     [`& ${CHILD_CLASS_KEY}`]: {
       fontSize: 14
     }
+  },
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
   }
 };
 
@@ -70,6 +76,43 @@ const SAMPLE_JILED_OBJECT = {
   },
   [`${CLASS_KEY} ${CHILD_CLASS_KEY}`]: {
     fontSize: 14
+  },
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
+  }
+};
+const SAMPLE_JILED_OBJECT_UNHASHED = {
+  [KEYFRAMES_KEY]: {
+    from: {
+      opacity: 0
+    },
+    to: {
+      opacity: 1
+    }
+  },
+  'html, body': {
+    display: 'block'
+  },
+  [CLASS_KEY]: {
+    animation: '2s test',
+    MozAppearance: 'none'
+  },
+  [MEDIA_QUERIES_KEY]: {
+    [CLASS_KEY]: {
+      color: 'blue'
+    }
+  },
+  [`${CLASS_KEY} ${CHILD_CLASS_KEY}`]: {
+    fontSize: 14
+  },
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
   }
 };
 
@@ -89,7 +132,7 @@ test('addKeyframe adds the keyframe declaration to the rules', (t) => {
 });
 
 test('addMediaQuery adds the media query declaration to the rules', (t) => {
-  const mediaQueryRules = addMediaQuery({}, MEDIA_QUERIES_KEY, SAMPLE_STYLE_OBJECT[CLASS_KEY][MEDIA_QUERIES_KEY], ID, CLASS_KEY);
+  const mediaQueryRules = addMediaQuery({}, MEDIA_QUERIES_KEY, SAMPLE_STYLE_OBJECT[CLASS_KEY][MEDIA_QUERIES_KEY], ID, true, CLASS_KEY);
 
   t.deepEqual(mediaQueryRules, {
     [MEDIA_QUERIES_KEY]: {
@@ -119,16 +162,24 @@ test('getFullKey produces key with both root and child', (t) => {
   t.is(getFullKey('.parent', '& .child'), keyWithRoot);
 });
 
-test('getRulesRecursive creates a flattened style object', (t) => {
-  const rules = getRulesRecursive(SAMPLE_STYLE_OBJECT, ID, '');
+test('getRulesRecursive creates a flattened style object, both with and without hashing', (t) => {
+  const rules = getRulesRecursive(SAMPLE_STYLE_OBJECT, ID, '', true);
 
   t.deepEqual(rules, SAMPLE_JILED_OBJECT);
+
+  const unhashedRules = getRulesRecursive(SAMPLE_STYLE_OBJECT, ID, '', false);
+
+  t.deepEqual(unhashedRules, SAMPLE_JILED_OBJECT_UNHASHED);
 });
 
-test('getRules calls getRulesRecursive to build a flattened style object', (t) => {
-  const rules = getRules(SAMPLE_STYLE_OBJECT, ID);
+test('getRules calls getRulesRecursive to build a flattened style object, both with and without hashing', (t) => {
+  const rules = getRules(SAMPLE_STYLE_OBJECT, ID, true);
 
   t.deepEqual(rules, SAMPLE_JILED_OBJECT);
+
+  const unhashedRules = getRules(SAMPLE_STYLE_OBJECT, ID, false);
+
+  t.deepEqual(unhashedRules, SAMPLE_JILED_OBJECT_UNHASHED);
 });
 
 test('getSortedKeys puts keyframes first, leaves all other keys in order', (t) => {
@@ -137,7 +188,8 @@ test('getSortedKeys puts keyframes first, leaves all other keys in order', (t) =
   t.deepEqual(sortedKeys, [
     KEYFRAMES_KEY,
     'html, body',
-    CLASS_KEY
+    CLASS_KEY,
+    '@font-face'
   ]);
 });
 

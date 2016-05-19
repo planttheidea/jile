@@ -62,5 +62,5 @@
     "test": "NODE_ENV=test ava test/index.test.js",
     "test-timed": "NODE_ENV=test TIMED=true ava test/index.test.js"
   },
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

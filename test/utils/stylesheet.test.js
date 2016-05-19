@@ -19,6 +19,10 @@ import {
 } from '../../src/utils/stylesheet';
 
 const ID = 'ava-test';
+const ID_SELECTOR = `#${ID}`;
+
+const GLOBAL_ID = 'global-ava-test';
+const GLOBAL_ID_SELECTOR = `#${GLOBAL_ID}`;
 
 const CLASS_SELECTOR = '.class';
 const CHILD_SELECTOR = '#child .selector';
@@ -136,7 +140,7 @@ test('getStandardBlock constructs a valid block of CSS for a given selector and 
 
   let selectorMap = {};
 
-  const standardBlock = getStandardBlock(selector, block, selectorMap, ID);
+  const standardBlock = getStandardBlock(selector, block, selectorMap, ID, true);
 
   t.is(finalBlock, standardBlock);
   t.deepEqual(selectorsMapped, selectorMap);
@@ -196,7 +200,7 @@ ${hashedSimpleKeyframesTitle} {
   }
 }`;
 
-  const simpleKeyframesBlock = getKeyframesBlock(simpleKeyframesTitle, simpleKeyframesRule, selectorMap, ID);
+  const simpleKeyframesBlock = getKeyframesBlock(simpleKeyframesTitle, simpleKeyframesRule, selectorMap, ID, true);
 
   t.is(simpleKeyframesBlock, simpleKeyframesResult);
 
@@ -244,7 +248,7 @@ ${hashedPercentageKeyframesTitle} {
   }
 }`;
 
-  const percentageKeyframesBlock = getKeyframesBlock(percentageKeyframesTitle, percentageKeyframesRule, selectorMap, ID);
+  const percentageKeyframesBlock = getKeyframesBlock(percentageKeyframesTitle, percentageKeyframesRule, selectorMap, ID, true);
 
   t.is(percentageKeyframesBlock, percentageKeyframesResult);
 
@@ -290,7 +294,7 @@ ${screenWidthTitle} {
   }
 }`;
 
-  const screenWidthBlock = getMediaQueryBlock(screenWidthTitle, screenWidthRule, selectorMap, ID);
+  const screenWidthBlock = getMediaQueryBlock(screenWidthTitle, screenWidthRule, selectorMap, ID, true);
 
   t.is(screenWidthResult, screenWidthBlock);
 
@@ -346,6 +350,12 @@ const ORIGINAL_RULES = {
   },
   '@page': {
     size: 'Letter landscape'
+  },
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
   }
 };
 const FORMATTED_RULES = {
@@ -387,6 +397,12 @@ const FORMATTED_RULES = {
   },
   '@page': {
     size: 'Letter landscape'
+  },
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
   }
 };
 const HASHED_PARENT = hash('parent', ID);
@@ -430,10 +446,15 @@ html, body {
 }
 @page {
   size: Letter landscape;
+}
+@font-face {
+  font-family: TestWebFont;
+  src: url('webfont.eot');
+  src: url('webfont.eot?#iefix') format('embedded-opentype'), url('webfont.woff2') format('woff2'), url('webfont.woff') format('woff'), url('webfont.ttf') format('truetype'), url('webfont.svg#svgFontName') format('svg');
 }`;
 
 test('buildStylesheetContent creates property textContent for a style tag, as well as selectorMap', (t) => {
-  const stylesheetContent = buildStylesheetContent(FORMATTED_RULES, ID);
+  const stylesheetContent = buildStylesheetContent(FORMATTED_RULES, ID, true);
   const {
     css,
     selectorMap
@@ -448,14 +469,12 @@ test('buildStylesheetContent creates property textContent for a style tag, as we
   });
 });
 
-const ID_SELECTOR = `#${ID}`;
-
 test('addStylesheetToHead builds stylesheet and adds it to the document\'s head', (t) => {
   const existingStylesheet = document.querySelector(ID_SELECTOR);
 
   t.is(existingStylesheet, null);
 
-  addStylesheetToHead(ID, FORMATTED_RULES);
+  addStylesheetToHead(ID, FORMATTED_RULES, true);
 
   const newStylesheet = document.querySelector(ID_SELECTOR);
 
@@ -475,12 +494,74 @@ test('removeStylesheetFromHead removes existing stylesheet from document\'s head
   t.is(removedStylesheet, null);
 });
 
+const GLOBAL_STYLES_OBJECT = {
+  '@keyframes spin': {
+    '0%': {
+      transform: 'rotate(0deg)'
+    },
+    '100%': {
+      transform: 'rotate(359deg)'
+    }
+  },
+  '.container': {
+    display: 'inline-block',
+
+    '& .header': {
+      animation: '2s spin'
+    },
+
+    '@media screen and (min-width: 800px)': {
+      display: 'block'
+    },
+
+    '@media print': {
+      backgroundColor: 'white'
+    }
+  },
+  '@font-face': {
+    fontFamily: 'TestWebFont',
+    src: 'url(\'webfont.eot?#iefix\') format(\'embedded-opentype\'), url(\'webfont.woff2\') format(\'woff2\'), ' +
+      'url(\'webfont.woff\') format(\'woff\'), url(\'webfont.ttf\') format(\'truetype\'), ' +
+      'url(\'webfont.svg#svgFontName\') format(\'svg\')'
+  }
+};
+const GLOBAL_STYLES_EXPECTED_RESULT = `
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+.container {
+  display: inline-block;
+}
+.container .header {
+  animation: 2s spin;
+}
+@media screen and (min-width: 800px) {
+  .container {
+    display: block;
+  }
+}
+@media print {
+  .container {
+    background-color: white;
+  }
+}
+@font-face {
+  font-family: TestWebFont;
+  src: url('webfont.eot');
+  src: url('webfont.eot?#iefix') format('embedded-opentype'), url('webfont.woff2') format('woff2'), url('webfont.woff') format('woff'), url('webfont.ttf') format('truetype'), url('webfont.svg#svgFontName') format('svg');
+}`;
+
 test('buildStylesheet builds stylesheet and adds to document\'s head', (t) => {
   const existingStylesheet = document.querySelector(ID_SELECTOR);
 
   t.is(existingStylesheet, null);
 
-  const selectorMap = buildStylesheet(ID, ORIGINAL_RULES);
+  const selectorMap = buildStylesheet(ID, ORIGINAL_RULES, true);
   const newStylesheet = document.querySelector(ID_SELECTOR);
 
   t.not(newStylesheet, null);
@@ -490,4 +571,11 @@ test('buildStylesheet builds stylesheet and adds to document\'s head', (t) => {
     parent: HASHED_PARENT,
     child: HASHED_CHILD
   });
+
+  buildStylesheet(GLOBAL_ID, GLOBAL_STYLES_OBJECT, false);
+
+  const newGlobalStylesheet = document.querySelector(GLOBAL_ID_SELECTOR);
+
+  t.not(newGlobalStylesheet, null);
+  t.is(newGlobalStylesheet.textContent, GLOBAL_STYLES_EXPECTED_RESULT);
 });
