@@ -150,13 +150,14 @@ const setChildAnimation = (string, fieldToTest) => {
  * @param {string} query
  * @param {object} value
  * @param {string} styleId
- * @param {string} root
+ * @param {boolean} shouldHashSelectors
+ * @param {string} root=''
  * @returns {object}
  */
-const addMediaQuery = (rules, query, value, styleId, root = '') => {
+const addMediaQuery = (rules, query, value, styleId, shouldHashSelectors, root = '') => {
   const mediaQueryRules = getRulesRecursive(root === '' ? value : {
     [root]: value
-  }, styleId, '');
+  }, styleId, '', shouldHashSelectors);
 
   return merge(rules, {
     [query]: mediaQueryRules
@@ -171,42 +172,47 @@ const addMediaQuery = (rules, query, value, styleId, root = '') => {
  * @param {object} styles
  * @param {string} styleId
  * @param {string} root
+ * @param {string} shouldHashSelectors
  * @returns {object}
  */
-const getRulesRecursive = (styles, styleId, root) => {
+const getRulesRecursive = (styles, styleId, root, shouldHashSelectors) => {
   let rules = {};
 
   const sortedKeys = getSortedKeys(styles);
 
   sortedKeys.forEach((key) => {
-    const child = styles[key];
+    let child = styles[key];
 
-    if (child.hasOwnProperty('animation')) {
+    if (shouldHashSelectors && child.hasOwnProperty('animation')) {
       for (let keyframe in keyframesMap) {
-        const childAnimation = setChildAnimation(child.animation, keyframe);
+        const animation = setChildAnimation(child.animation, keyframe);
 
-        if (child.animation !== childAnimation) {
-          child.animation = childAnimation;
+        if (child.animation !== animation) {
+          child = {
+            ...child,
+            animation
+          };
           break;
         }
       }
     }
 
-    if (child.hasOwnProperty('animationName')) {
+    if (shouldHashSelectors && child.hasOwnProperty('animationName')) {
       for (let keyframe in keyframesMap) {
-        const childAnimationName = setChildAnimation(child.animationName, keyframe);
+        const animationName = setChildAnimation(child.animationName, keyframe);
 
-        if (child.animationName !== childAnimationName) {
-          child.animationName = childAnimationName;
+        if (child.animationName !== animationName) {
+          child = {
+            ...child,
+            animationName
+          };
           break;
         }
       }
     }
 
     if (isMediaQuery(key)) {
-      
-      
-      rules = addMediaQuery(rules, key, child, styleId, root);
+      rules = addMediaQuery(rules, key, child, styleId, shouldHashSelectors, root);
     } else if (isKeyframes(key)) {
       rules = addKeyframe(rules, key, child, styleId);
     } else if (isPage(key)) {
@@ -226,7 +232,7 @@ const getRulesRecursive = (styles, styleId, root) => {
         GET_OWN_PROPERTY_NAMES(child).forEach((childKey) => {
           if (isObject(child[childKey])) {
             const fullKey = getFullKey(root, key);
-            const childRules = getRulesRecursive(child, styleId, fullKey);
+            const childRules = getRulesRecursive(child, styleId, fullKey, shouldHashSelectors);
 
             rules = merge(rules, childRules);
           }
@@ -244,10 +250,11 @@ const getRulesRecursive = (styles, styleId, root) => {
  *
  * @param {object} styles
  * @param {string} styleId
+ * @param {boolean} shouldHashSelectors
  * @returns {object}
  */
-const getRules = (styles, styleId) => {
-  return getRulesRecursive(styles, styleId, '');
+const getRules = (styles, styleId, shouldHashSelectors) => {
+  return getRulesRecursive(styles, styleId, '', shouldHashSelectors);
 };
 
 export {addKeyframe};

@@ -1,10 +1,21 @@
 import isObject from 'lodash/isObject';
 
 import {
+  FONT_FACE_REGEXP,
   KEYFRAMES_REGEXP,
   MEDIA_QUERY_REGEXP,
   PAGE_REGEXP
 } from './regexps';
+
+/**
+ * test if key contains an @font-face declaration
+ *
+ * @param {string} key
+ * @returns {boolean}
+ */
+const isFontFace = (key) => {
+  return FONT_FACE_REGEXP.test(key);
+};
 
 /**
  * test if key contains an @media declaration
@@ -56,12 +67,14 @@ const isPage = (key) => {
   return PAGE_REGEXP.test(key);
 };
 
+export {isFontFace};
 export {isKeyframes};
 export {isMediaQuery};
 export {isNestedProperty};
 export {isPage};
 
 export default {
+  isFontFace,
   isKeyframes,
   isMediaQuery,
   isNestedProperty,

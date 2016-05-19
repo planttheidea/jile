@@ -5,6 +5,7 @@ import kebabCase from 'lodash/kebabCase';
 import getRules from './rules';
 import hash from './hash';
 import {
+  isFontFace,
   isKeyframes,
   isMediaQuery
 } from './is';
@@ -208,10 +209,11 @@ const getNewline = (newlines = 1) => {
  * @param {object} rule
  * @param {object} selectorMap
  * @param {string} styleId
+ * @param {boolean} shouldHashSelectors
  * @returns {string}
  */
-const getKeyframesBlock = (selector, rule, selectorMap, styleId) => {
-  const hashedSelector = hashKeyframesName(selector, styleId, selectorMap);
+const getKeyframesBlock = (selector, rule, selectorMap, styleId, shouldHashSelectors) => {
+  const hashedSelector = shouldHashSelectors ? hashKeyframesName(selector, styleId, selectorMap) : selector;
 
   let textContent = getNewline();
 
@@ -247,18 +249,19 @@ const getKeyframesBlock = (selector, rule, selectorMap, styleId) => {
  * @param {object} rule
  * @param {object} selectorMap
  * @param {string} styleId
+ * @param {boolean} shouldHashSelectors
  * @param {number} indent=0
  * @returns {string}
  */
-const getMediaQueryBlock = (selector, rule, selectorMap, styleId, indent = 0) => {
+const getMediaQueryBlock = (selector, rule, selectorMap, styleId, shouldHashSelectors, indent = 0) => {
   let textContent = getNewline() + getIndent(indent) + `${selector} {`;
 
   GET_OWN_PROPERTY_NAMES(rule).forEach((subSelector) => {
     if (isMediaQuery(subSelector)) {
-      textContent += getMediaQueryBlock(subSelector, rule[subSelector], selectorMap, styleId, indent + 2);
+      textContent += getMediaQueryBlock(subSelector, rule[subSelector], selectorMap, styleId, shouldHashSelectors, indent + 2);
     } else {
       const subSelectorBlock = rule[subSelector];
-      const hashedSelector = hashSelector(subSelector, styleId, selectorMap);
+      const hashedSelector = shouldHashSelectors ? hashSelector(subSelector, styleId, selectorMap) : subSelector;
 
       textContent += getNewline() + getIndent(indent + 2);
       textContent += `${hashedSelector} {`;
@@ -284,17 +287,29 @@ const getMediaQueryBlock = (selector, rule, selectorMap, styleId, indent = 0) =>
  * @param {object} rule
  * @param {object} selectorMap
  * @param {string} styleId
+ * @param {boolean} shouldHashSelectors
+ * @param {boolean} isSelectorFontFace
  * @returns {string}
  */
-const getStandardBlock = (selector, rule, selectorMap, styleId) => {
-  const hashedSelector = hashSelector(selector, styleId, selectorMap);
+const getStandardBlock = (selector, rule, selectorMap, styleId, shouldHashSelectors, isSelectorFontFace) => {
+  const hashedSelector = shouldHashSelectors ? hashSelector(selector, styleId, selectorMap) : selector;
 
   let textContent = getNewline();
 
   textContent += `${hashedSelector} {`;
 
   for (let property in rule) {
-    textContent += buildPropertyValues(property, rule);
+    if (isSelectorFontFace && property === 'src') {
+      const matches = rule[property].match(/url\((.*?).eot(.*?)\)/);
+
+      if (matches && matches[1]) {
+        const fileName = matches[1].replace(/['"]/, '');
+
+        textContent += getNewline() + getIndent(2) + `src: url('${fileName}.eot');`;
+      }
+    }
+
+    textContent += buildPropertyValues(property, rule, 2, isSelectorFontFace);
   }
 
   textContent += getNewline();
@@ -309,9 +324,10 @@ const getStandardBlock = (selector, rule, selectorMap, styleId) => {
  * 
  * @param {object} rules
  * @param {string} styleId
+ * @param {boolean} shouldHashSelectors
  * @returns {{selectorMap: object, textContent: string}}
  */
-const buildStylesheetContent = (rules, styleId) => {
+const buildStylesheetContent = (rules, styleId, shouldHashSelectors) => {
   const selectors = GET_OWN_PROPERTY_NAMES(rules);
 
   let selectorMap = {},
@@ -321,11 +337,11 @@ const buildStylesheetContent = (rules, styleId) => {
     const rule = rules[selector];
 
     if (isKeyframes(selector)) {
-      css += getKeyframesBlock(selector, rule, selectorMap, styleId);
+      css += getKeyframesBlock(selector, rule, selectorMap, styleId, shouldHashSelectors);
     } else if (isMediaQuery(selector)) {
-      css += getMediaQueryBlock(selector, rule, selectorMap, styleId);
+      css += getMediaQueryBlock(selector, rule, selectorMap, styleId, shouldHashSelectors);
     } else {
-      css += getStandardBlock(selector, rule, selectorMap, styleId);
+      css += getStandardBlock(selector, rule, selectorMap, styleId, shouldHashSelectors, isFontFace(selector));
     }
   });
   
@@ -341,17 +357,19 @@ const buildStylesheetContent = (rules, styleId) => {
  * 
  * @param {string} styleId
  * @param {object} rules
+ * @param {boolean} shouldHashSelectors
  * @returns {object}
  */
-const addStylesheetToHead = (styleId, rules) => {
-  const stylesheetObject = buildStylesheetContent(rules, styleId);
-  const existingStyle = document.querySelector(`#${styleId}`);
+const addStylesheetToHead = (styleId, rules, shouldHashSelectors) => {
+  const stylesheetObject = buildStylesheetContent(rules, styleId, shouldHashSelectors);
   const {
     css,
     selectorMap
   } = stylesheetObject;
 
   const textContent = IS_PRODUCTION ? sqwish(css) : css;
+
+  const existingStyle = document.querySelector(`#${styleId}`);
 
   if (isElement(existingStyle)) {
     existingStyle.textContent = textContent;
@@ -409,12 +427,13 @@ const removeStylesheetFromHead = (styleId) => {
  * 
  * @param {string} styleId
  * @param {object} styles
+ * @param {boolean} shouldHashSelectors
  * @returns {Object}
  */
-const buildStylesheet = (styleId, styles) => {
-  const rules = getRules(styles, styleId);
+const buildStylesheet = (styleId, styles, shouldHashSelectors) => {
+  const rules = getRules(styles, styleId, shouldHashSelectors);
   
-  return addStylesheetToHead(styleId, rules);
+  return addStylesheetToHead(styleId, rules, shouldHashSelectors);
 };
 
 export {addStylesheetToHead};
