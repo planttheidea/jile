@@ -34,7 +34,7 @@ With output of:
 </div>
 ```
 
-This example uses [React](https://github.com/facebook/react), but it you can use it with anything as it has no dependencies on a particular view library or framework.
+This example uses [React](https://github.com/facebook/react), but you can use it with anything as it has no dependencies on a particular view library or framework.
 
 #### How it works
 
@@ -266,7 +266,7 @@ Pretty standard stuff, pull down the repo and `npm i`. There are some built-in s
 * `npm run build-minified` = build dist/jile.min.js
 * `npm run compile` = transpile files in src/* to lib/*
 * `npm run example` = runs example app on localhost:4000 (it's a playground, have fun)
-* `npm run prepublish` = runs the above `compile`, `build`, and `build-minified` scropts
+* `npm run prepublish` = runs the above `compile`, `build`, and `build-minified` scripts
 * `npm run test` = runs [AVA](https://github.com/avajs/ava) test scripts
 * `npm run test-timed` runes same scripts as `test`, but outputs completion times for each test
 
