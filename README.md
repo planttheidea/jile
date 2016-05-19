@@ -189,7 +189,7 @@ Creates the following output:
     src: url("webfont.eot?#iefix") format("embedded-opentype"), url("webfont.woff2") format("woff2"), url("webfont.woff") format("woff"), url("webfont.ttf") format("truetype"), url("webfont.svg#svgFontName") format("svg");
 }
 ```
-The injected `.eot` above the regular declaration is only if you provide an `.eot` yourself, as the injected declaration is for IE9 compat mode where as the `#iefix` declaration is for standard IE.
+The injected `.eot` above the regular declaration is only if you provide an `.eot` in the provided object as one of the `src` values, as the injected declaration is for IE9 compat mode where as the `#iefix` declaration is for standard IE.
 
 **Global selectors**
 
@@ -219,6 +219,12 @@ const globalStyles = {
 };
 
 jile('global-styles', globalStyles, false);
+```
+Outputs:
+```
+.container {
+    height: 100vh;
+}
 ```
 The boolean parameter `false` following the styles object tells jile not to hash any selectors.
 
