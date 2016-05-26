@@ -1,6 +1,7 @@
 import isElement from 'lodash/isElement';
 import isNumber from 'lodash/isNumber';
 import kebabCase from 'lodash/kebabCase';
+import mincss from 'min.css';
 
 import getRules from './rules';
 import hash from './hash';
@@ -15,7 +16,6 @@ import {
   HASH_SELECTOR_REGEXP,
   KEYFRAMES_FOLLOWED_BY_NAME_REGEXP
 } from './regexps';
-import sqwish from './sqwish';
 
 const URL = window.URL || window.webkitURL;
 const hasBlobSupport = !!(window.Blob && typeof window.Blob === 'function' && URL.createObjectURL);
@@ -367,7 +367,7 @@ const addStylesheetToHead = (styleId, rules, shouldHashSelectors) => {
     selectorMap
   } = stylesheetObject;
 
-  const textContent = IS_PRODUCTION ? sqwish(css) : css;
+  const textContent = IS_PRODUCTION ? mincss(css) : css;
 
   const existingStyle = document.querySelector(`#${styleId}`);
 

@@ -1,5 +1,4 @@
 import test from 'ava';
-import 'babel-core/register';
 import performanceNow from 'performance-now';
 
 import jile from '../src';
@@ -44,7 +43,6 @@ test.after(() => {
 import './utils/is.test.js';
 import './utils/prefix.test.js';
 import './utils/hash.test.js';
-import './utils/sqwish.test.js';
 import './utils/rules.test.js';
 import './utils/stylesheet.test.js';
 
