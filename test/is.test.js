@@ -5,7 +5,7 @@ import {
   isMediaQuery,
   isNestedProperty,
   isPage
-} from '../../src/utils/is';
+} from '../src/is';
 
 test('if selector key passed in is an @keyframes declaration', (t) => {
   const isKeyframesTrue = isKeyframes('@keyframes test');

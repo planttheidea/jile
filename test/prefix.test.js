@@ -4,7 +4,7 @@ import {
   getKeyframesPrefix,
   prefix,
   setPrefixer
-} from '../../src/utils/prefix';
+} from '../src/prefix';
 
 test('getKeyframesPrefix returns valid prefix', (t) => {
   const keyframesPrefix = getKeyframesPrefix();

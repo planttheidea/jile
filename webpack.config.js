@@ -21,29 +21,33 @@ module.exports = {
     formatter: eslintFriendlyFormatter
   },
 
+  externals: {
+    'inline-style-prefixer': {
+      amd: 'inline-style-prefixer',
+      commonjs: 'inline-style-prefixer',
+      commonjs2: 'inline-style-prefixer',
+      root: 'Prefixer'
+    }
+  },
+
   module: {
     preLoaders: [
       {
-        include: /src/,
+        include: [
+          /src/
+        ],
         loader: 'eslint-loader',
-        test: /\.(js|jsx)$/
+        test: /\.js$/
       }
     ],
 
     loaders: [
       {
-        exclude: /node_modules/,
-        loader: 'babel',
-        test: /\.(js|jsx)?$/
-      }, {
-        exclude: /node_modules/,
-        loaders: [
-          'style',
-          'css?sourceMap&modules',
-          'postcss',
-          'sass'
+        include: [
+          /src/
         ],
-        test: /\.scss?$/
+        loader: 'babel',
+        test: /\.js?$/
       }
     ]
   },

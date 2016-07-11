@@ -2,10 +2,10 @@ import test from 'ava';
 import performanceNow from 'performance-now';
 
 import jile from '../src';
-import hash from '../src/utils/hash';
+import hash from '../src/hash';
 import {
   setPrefixer
-} from '../src/utils/prefix';
+} from '../src/prefix';
 
 let startTime;
 
@@ -40,11 +40,11 @@ test.after(() => {
 });
 
 // utils
-import './utils/is.test.js';
-import './utils/prefix.test.js';
-import './utils/hash.test.js';
-import './utils/rules.test.js';
-import './utils/stylesheet.test.js';
+import './is.test.js';
+import './prefix.test.js';
+import './hash.test.js';
+import './rules.test.js';
+import './stylesheet.test.js';
 
 const ID = 'ava-test-2';
 const ID_SELECTOR = `#${ID}`;

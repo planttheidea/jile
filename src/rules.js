@@ -2,6 +2,7 @@ import merge from 'lodash/merge';
 import isNaN from 'lodash/isNaN';
 import isObject from 'lodash/isObject';
 
+import forEach from './forEach';
 import hash from './hash';
 import {
   isKeyframes,
@@ -67,7 +68,7 @@ const getSortedKeys = (object) => {
 const addToRules = (rules, key, value) => {
   let cleanValue = {};
 
-  GET_OWN_PROPERTY_NAMES(value).forEach((valueKey) => {
+  forEach(GET_OWN_PROPERTY_NAMES(value), (valueKey) => {
     if (!isObject(value[valueKey])) {
       cleanValue[valueKey] = value[valueKey];
     }
@@ -104,7 +105,7 @@ const addKeyframe = (rules, key, value, styleId) => {
 
   let cleanValue = {};
 
-  GET_OWN_PROPERTY_NAMES(value).forEach((valueKey) => {
+  forEach(GET_OWN_PROPERTY_NAMES(value), (valueKey) => {
     if (valueKey !== 'from' && valueKey !== 'to' && isNaN(parseInt(valueKey, 10))) {
       throw new Error(`The increment entered for the KEYFRAMES_REGEXP declaration is invalid, entries must be either "from", "to", or a percentage.`);
     }
@@ -135,11 +136,9 @@ const setChildAnimation = (string, fieldToTest) => {
     return string;
   }
 
-  const hashedString = string.replace(regexp, (value) => {
+  return string.replace(regexp, (value) => {
     return keyframesMap[value] || value;
   });
-
-  return hashedString;
 };
 
 /**
@@ -180,7 +179,7 @@ const getRulesRecursive = (styles, styleId, root, shouldHashSelectors) => {
 
   const sortedKeys = getSortedKeys(styles);
 
-  sortedKeys.forEach((key) => {
+  forEach(sortedKeys, (key) => {
     let child = styles[key];
 
     if (shouldHashSelectors && child.hasOwnProperty('animation')) {
@@ -229,7 +228,7 @@ const getRulesRecursive = (styles, styleId, root, shouldHashSelectors) => {
       }
 
       if (isChildObject) {
-        GET_OWN_PROPERTY_NAMES(child).forEach((childKey) => {
+        forEach(GET_OWN_PROPERTY_NAMES(child), (childKey) => {
           if (isObject(child[childKey])) {
             const fullKey = getFullKey(root, key);
             const childRules = getRulesRecursive(child, styleId, fullKey, shouldHashSelectors);
