@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const eslintFriendlyFormatter = require('eslint-friendly-formatter');
 
-const PORT = 4000;
+const PORT = 3000;
 
 module.exports = {
   cache: true,
@@ -27,7 +27,7 @@ module.exports = {
   devtool: 'eval-cheap-module-source-map',
 
   entry: [
-    path.resolve (__dirname, 'test/App.jsx')
+    path.resolve (__dirname, 'DEV_ONLY', 'App.js')
   ],
 
   eslint: {
@@ -41,24 +41,23 @@ module.exports = {
   module: {
     preLoaders: [
       {
-        exclude: /\.test\.js/,
         include: [
           /src/,
-          /test/
+          /example/
         ],
         loader: 'eslint-loader',
-        test: /\.(js|jsx)$/
+        test: /\.js$/
       }
     ],
 
     loaders: [
       {
-        exclude: [
-          /node_modules/,
-          /\.test\.js/
+        include: [
+          /src/,
+          /example/
         ],
         loader: 'babel',
-        test: /\.(js|jsx)?$/
+        test: /\.js?$/
       }
     ]
   },

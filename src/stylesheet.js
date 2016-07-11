@@ -3,6 +3,7 @@ import isNumber from 'lodash/isNumber';
 import kebabCase from 'lodash/kebabCase';
 import mincss from 'min.css';
 
+import forEach from './forEach';
 import getRules from './rules';
 import hash from './hash';
 import {
@@ -219,21 +220,21 @@ const getKeyframesBlock = (selector, rule, selectorMap, styleId, shouldHashSelec
 
   textContent += `${hashedSelector} {`;
 
-  GET_OWN_PROPERTY_NAMES(rule)
-    .sort(sortKeyframesKeys)
-    .forEach((increment) => {
-      const incrementValue = rule[increment];
+  const sortedNames = GET_OWN_PROPERTY_NAMES(rule).sort(sortKeyframesKeys);
+  
+  forEach(sortedNames, (increment) => {
+    const incrementValue = rule[increment];
 
-      textContent += getNewline() + getIndent(2);
-      textContent += `${increment} {`;
+    textContent += getNewline() + getIndent(2);
+    textContent += `${increment} {`;
 
-      for (let property in incrementValue) {
-        textContent += buildPropertyValues(property, incrementValue, 4);
-      }
+    for (let property in incrementValue) {
+      textContent += buildPropertyValues(property, incrementValue, 4);
+    }
 
-      textContent += getNewline() + getIndent(2);
-      textContent += '}';
-    });
+    textContent += getNewline() + getIndent(2);
+    textContent += '}';
+  });
 
   textContent += getNewline();
   textContent += '}';
@@ -256,7 +257,7 @@ const getKeyframesBlock = (selector, rule, selectorMap, styleId, shouldHashSelec
 const getMediaQueryBlock = (selector, rule, selectorMap, styleId, shouldHashSelectors, indent = 0) => {
   let textContent = getNewline() + getIndent(indent) + `${selector} {`;
 
-  GET_OWN_PROPERTY_NAMES(rule).forEach((subSelector) => {
+  forEach(GET_OWN_PROPERTY_NAMES(rule), (subSelector) => {
     if (isMediaQuery(subSelector)) {
       textContent += getMediaQueryBlock(subSelector, rule[subSelector], selectorMap, styleId, shouldHashSelectors, indent + 2);
     } else {
@@ -333,7 +334,7 @@ const buildStylesheetContent = (rules, styleId, shouldHashSelectors) => {
   let selectorMap = {},
       css = '';
 
-  selectors.forEach((selector) => {
+  forEach(selectors, (selector) => {
     const rule = rules[selector];
 
     if (isKeyframes(selector)) {

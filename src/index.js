@@ -2,15 +2,15 @@ import isObject from 'lodash/isObject';
 
 import {
   setPrefixer
-} from './utils/prefix';
+} from './prefix';
 import {
   getRules
-} from './utils/rules';
+} from './rules';
 import {
   buildStylesheet,
   buildStylesheetContent,
   removeStylesheetFromHead
-} from './utils/stylesheet';
+} from './stylesheet';
 
 let counter = -1;
 

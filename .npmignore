@@ -1,10 +1,11 @@
 .idea
-dist
+example
 node_modules
 src
 test
 .babelrc
 .eslintrc
 .gitignore
-.npmignore
-webpack.*.js
+webpack.config.App.js
+webpack.config.js
+webpack.config.minified.js

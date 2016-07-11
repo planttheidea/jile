@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import hash from '../../src/utils/hash';
+import hash from '../src/hash';
 import {
   addKeyframe,
   addMediaQuery,
@@ -10,7 +10,7 @@ import {
   getRulesRecursive,
   getSortedKeys,
   setChildAnimation
-} from '../../src/utils/rules';
+} from '../src/rules';
 
 const ID = 'ava-test';
 

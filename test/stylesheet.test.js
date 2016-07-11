@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import hash from '../../src/utils/hash';
+import hash from '../src/hash';
 import {
   addStylesheetToHead,
   applyPrefixWithLeadingDash,
@@ -16,7 +16,7 @@ import {
   hashSelector,
   removeStylesheetFromHead,
   sortKeyframesKeys
-} from '../../src/utils/stylesheet';
+} from '../src/stylesheet';
 
 const ID = 'ava-test';
 const ID_SELECTOR = `#${ID}`;
@@ -58,13 +58,13 @@ test('hashSelector hashes selector and populates selectorMap with class/ID => ha
   const pseudoHash = hashSelector(PSEUDO_SELECTOR, ID, selectorMap);
   const hoverHash = hashSelector(HOVER_SELECTOR, ID, selectorMap);
 
-  t.is(classHash, '.jile__class__901825323');
-  t.is(childHash, '#jile__child__502167326 .jile__selector__2969659026');
-  t.is(immediateChildHash, '#jile__immediateChild__2177046488 > .jile__selector__2969659026');
-  t.is(nextSiblingHash, '#jile__nextSibling__4255046108 + .jile__selector__2969659026');
-  t.is(generalSiblingHash, '#jile__generalSibling__2160388995 ~ button.jile__selector__2969659026');
-  t.is(pseudoHash, '.jile__pseudoSelector__3178036800::before');
-  t.is(hoverHash, '#jile__hoverSelector__2846023241:hover');
+  t.is(classHash, '.jile__class__4002894411');
+  t.is(childHash, '#jile__child__3981255983 .jile__selector__4268936560');
+  t.is(immediateChildHash, '#jile__immediateChild__1724749822 > .jile__selector__4268936560');
+  t.is(nextSiblingHash, '#jile__nextSibling__234506326 + .jile__selector__4268936560');
+  t.is(generalSiblingHash, '#jile__generalSibling__747525191 ~ button.jile__selector__4268936560');
+  t.is(pseudoHash, '.jile__pseudoSelector__3683272808::before');
+  t.is(hoverHash, '#jile__hoverSelector__3194218998:hover');
 });
 
 test('getIndent returns the appropriate amount of spaces', (t) => {
@@ -125,17 +125,17 @@ test('getStandardBlock constructs a valid block of CSS for a given selector and 
     WebkitAppearance: 'none'
   };
   const finalBlock = `
-#jile__some__566952304 .jile__crazy__2096108025:hover > .jile__ridiculous__1408983016 + .jile__selector__2969659026 {
+#jile__some__2723687217 .jile__crazy__4014502326:hover > .jile__ridiculous__2064500032 + .jile__selector__4268936560 {
   background-color: red;
   color: white;
   display: block;
   -webkit-appearance: none;
 }`;
   const selectorsMapped = {
-    some: 'jile__some__566952304',
-    crazy: 'jile__crazy__2096108025',
-    ridiculous: 'jile__ridiculous__1408983016',
-    selector: 'jile__selector__2969659026'
+    some: 'jile__some__2723687217',
+    crazy: 'jile__crazy__4014502326',
+    ridiculous: 'jile__ridiculous__2064500032',
+    selector: 'jile__selector__4268936560'
   };
 
   let selectorMap = {};

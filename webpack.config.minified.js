@@ -9,7 +9,7 @@ var webpack = require("webpack"),
         filename:"jile.min.js"
       }),
 
-      plugins:defaultConfig.plugins.concat([
+      plugins: defaultConfig.plugins.concat([
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.optimize.UglifyJsPlugin({
