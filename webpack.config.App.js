@@ -39,6 +39,7 @@ module.exports = {
   module: {
     preLoaders: [
       {
+        cacheable: true,
         include: [
           /src/,
           /example/
@@ -50,11 +51,12 @@ module.exports = {
 
     loaders: [
       {
+        cacheable: true,
         include: [
           /src/,
           /example/
         ],
-        loader: 'babel',
+        loader: 'babel?cacheDirectory',
         test: /\.js?$/
       }
     ]

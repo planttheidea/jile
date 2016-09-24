@@ -5,8 +5,6 @@ const eslintFriendlyFormatter = require('eslint-friendly-formatter');
 module.exports = {
   cache: true,
 
-  debug: true,
-
   devtool: 'source-map',
 
   entry: [
