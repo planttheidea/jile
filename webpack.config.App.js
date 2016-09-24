@@ -8,8 +8,6 @@ const PORT = 3000;
 module.exports = {
   cache: true,
 
-  debug: true,
-
   devServer : {
     contentBase: './dist',
     host: 'localhost',
