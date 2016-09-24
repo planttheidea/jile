@@ -7,7 +7,7 @@ module.exports = {
 
   debug: true,
 
-  devtool: 'eval-cheap-module-source-map',
+  devtool: 'source-map',
 
   entry: [
     path.resolve (__dirname, 'src/index.js')
@@ -70,10 +70,6 @@ module.exports = {
     extensions: [
       '',
       '.js'
-    ],
-
-    fallback: [
-      path.join (__dirname, 'src')
     ],
 
     root: __dirname

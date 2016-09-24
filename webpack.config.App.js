@@ -24,10 +24,10 @@ module.exports = {
     }
   },
 
-  devtool: 'eval-cheap-module-source-map',
+  devtool: 'source-map',
 
   entry: [
-    path.resolve (__dirname, 'DEV_ONLY', 'App.js')
+    path.resolve (__dirname, 'example', 'App.js')
   ],
 
   eslint: {
@@ -85,10 +85,6 @@ module.exports = {
       '',
       '.js',
       '.jsx'
-    ],
-
-    fallback: [
-      path.join (__dirname, 'src')
     ],
 
     root: __dirname
