@@ -4305,8 +4305,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	
-	
+	/**
+	 * loops over items executing fn for each item
+	 * 
+	 * @param {array<*>} items
+	 * @param {function} fn
+	 */
 	var forEach = function forEach(items, fn) {
 	  var length = items.length;
 	
