@@ -1,69 +1,60 @@
-import isObject from 'lodash/isObject';
+// polyfills
+import 'blob-polyfill';
 
+// external dependencies
+import isPlainObject from 'lodash/isPlainObject';
+
+// utils
 import {
-  setPrefixer
-} from './prefix';
+  getCleanOptions
+} from './utils/general';
+import {
+  setPrefixerOptions
+} from './utils/prefix';
+
+// processing methods
+import {
+  manageTagMetadataObject
+} from './Jile';
 import {
   getRules
 } from './rules';
 import {
-  buildStylesheet,
-  buildStylesheetContent,
-  removeStylesheetFromHead
+  getCssAndSelectorMap
 } from './stylesheet';
 
-let counter = -1;
-
 /**
- * create jile stylesheet, where if styleId is a string then
- * assign the object to a style tag with an ID of that value,
- * else if it is an object just assign a generic ID to the style
- * tag
+ * create jile stylesheet based on styles and passedOptions, and
+ * return an object with the metadata properties
  *
- * @param {string|object} styleId
- * @param {object|boolean} styles={}
- * @param {boolean} shouldHashSelectors=true
- * @returns {object}
+ * @param {Object} styles
+ * @param {Object} passedOptions
+ * @param {boolean} passedOptions.autoMount
+ * @returns {Object}
  */
-const jile = (styleId, styles = {}, shouldHashSelectors = true) => {
-  const isStyleIdReallyStyles = isObject(styleId);
+const jile = (styles = {}, passedOptions = {}) => {
+  if (!isPlainObject(styles)) {
+    throw new TypeError('Styles passed need to be a plain object.');
+  }
 
-  const realStyleId = isStyleIdReallyStyles ? `jile-stylesheet-${++counter}` : styleId;
-  const realStyles = isStyleIdReallyStyles ? styleId : styles;
-  const realShouldHashSelectors = isStyleIdReallyStyles ? !!styles : shouldHashSelectors;
+  if (!isPlainObject(passedOptions)) {
+    throw new TypeError('Options passed need to be a plain object.');
+  }
 
-  return buildStylesheet(realStyleId, realStyles, realShouldHashSelectors);
-};
+  const options = getCleanOptions(passedOptions);
+  const flattenedStyles = getRules(styles, options);
+  const {
+    css,
+    selectorMap
+  } = getCssAndSelectorMap(flattenedStyles, options);
 
-/**
- * build the textContent for a style tag and return the content
- * and the selectorMap as an object (useful for server-side
- * generation, where there is no document)
- *
- * @param {string|object} styleId
- * @param {object|boolean} styles
- * @param {boolean} shouldHashSelectors=true
- * @returns {{selectorMap: Object, textContent: string}}
- */
-jile.noInject = (styleId, styles, shouldHashSelectors = true) => {
-  const isStyleIdReallyStyles = isObject(styleId);
+  const tagObject = manageTagMetadataObject(css, selectorMap, options);
 
-  const realStyleId = isStyleIdReallyStyles ? `jile-stylesheet-${++counter}` : styleId;
-  const realStyles = isStyleIdReallyStyles ? styleId : styles;
-  const realShouldHashSelectors = isStyleIdReallyStyles ? !!styles : shouldHashSelectors;
-
-  const rules = getRules(realStyles, realStyleId, realShouldHashSelectors);
-
-  return buildStylesheetContent(rules, realStyleId, realShouldHashSelectors);
-};
-
-/**
- * remove applied style from head of document
- *
- * @param {string} styleId
- */
-jile.remove = (styleId) => {
-  removeStylesheetFromHead(styleId);
+  if (options.autoMount) {
+    tagObject.add();
+  }
+  
+  return tagObject;
 };
 
 /**
@@ -71,6 +62,6 @@ jile.remove = (styleId) => {
  *
  * @type {setPrefixer}
  */
-jile.setPrefixer = setPrefixer;
+jile.setPrefixerOptions = setPrefixerOptions;
 
 export default jile;

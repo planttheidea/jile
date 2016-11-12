@@ -3,8 +3,10 @@
     "add-module-exports"
   ],
   "presets": [
-    "es2015",
-    "stage-0",
+    ["latest", {
+      "loose": true
+    }],
+    "stage-2",
     "react"
   ]
 }

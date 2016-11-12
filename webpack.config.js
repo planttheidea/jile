@@ -1,25 +1,29 @@
 const path = require('path');
 const webpack = require('webpack');
-const eslintFriendlyFormatter = require('eslint-friendly-formatter');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = {
-  cache: true,
-
-  devtool: 'source-map',
+  devtool: '#source-map',
 
   entry: [
-    path.resolve (__dirname, 'src/index.js')
+    path.resolve (__dirname, 'src', 'index.js')
   ],
 
   eslint: {
     configFile: '.eslintrc',
     emitError: true,
     failOnError: true,
-    failOnWarning: false,
-    formatter: eslintFriendlyFormatter
+    failOnWarning: true,
+    formatter: require('eslint-friendly-formatter')
   },
 
   externals: {
+    'hash-it': {
+      amd: 'hash-it',
+      commonjs: 'hash-it',
+      commonjs2: 'hash-it',
+      root: 'hashIt'
+    },
     'inline-style-prefixer': {
       amd: 'inline-style-prefixer',
       commonjs: 'inline-style-prefixer',
@@ -61,7 +65,8 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin([
       'NODE_ENV'
-    ])
+    ]),
+    new LodashModuleReplacementPlugin()
   ],
 
   resolve: {

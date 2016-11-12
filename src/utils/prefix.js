@@ -1,3 +1,4 @@
+// external dependencies
 import Prefixer from 'inline-style-prefixer';
 
 let prefixer = new Prefixer();
@@ -8,7 +9,7 @@ let prefixer = new Prefixer();
  *
  * @returns {string}
  */
-export const getKeyframesPrefix = () => {
+const getKeyframesPrefix = () => {
   return prefixer.prefixedKeyframes;
 };
 
@@ -18,7 +19,7 @@ export const getKeyframesPrefix = () => {
  * @param {object} styles
  * @returns {object}
  */
-export const prefix = (styles) => {
+const prefix = (styles) => {
   return prefixer.prefix(styles);
 };
 
@@ -30,12 +31,10 @@ export const prefix = (styles) => {
  * @param {boolean} [options.keepUnprefixed]
  * @param {string} [options.userAgent]
  */
-export const setPrefixer = (options = {}) => {
+const setPrefixerOptions = (options = {}) => {
   prefixer = new Prefixer(options);
 };
 
-export default {
-  getKeyframesPrefix,
-  prefix,
-  setPrefixer
-};
+export {getKeyframesPrefix};
+export {prefix};
+export {setPrefixerOptions};
