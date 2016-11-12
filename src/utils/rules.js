@@ -18,6 +18,7 @@ import {
 
 // constants
 import {
+  FONT_FACE_REGEXP,
   JILE_HASH_REGEXP,
   KEYFRAMES_FOLLOWED_BY_NAME_REGEXP,
   KEYFRAMES_REGEXP,
@@ -28,6 +29,7 @@ import {
   PAGE_TYPE,
   STANDARD_TYPE,
 
+  assign,
   getOwnPropertyNames
 } from './constants';
 
@@ -42,18 +44,41 @@ let keyframes = {};
  * @returns {string}
  */
 const getChildAnimationName = (string, fieldToTest) => {
-  const regexp = new RegExp(fieldToTest);
-
   /**
    * if its already been hashed before, just return it
    */
-  if (JILE_HASH_REGEXP.test(string)) {
+  if (isType(JILE_HASH_REGEXP, string)) {
     return string;
   }
+
+  const regexp = new RegExp(fieldToTest);
 
   return string.replace(regexp, (value) => {
     return keyframes[value] || value;
   });
+};
+
+/**
+ * get the cleaned animationName for the given object
+ *
+ * @param {Object} object
+ * @param {string} property
+ * @returns {Object}
+ */
+const getAnimationName = (object, property) => {
+  for (let keyframe in keyframes) {
+    const animation = getChildAnimationName(object[property], keyframe);
+
+    if (object[property] !== animation) {
+      object = assign(object, {
+        animation
+      });
+
+      break;
+    }
+  }
+
+  return object;
 };
 
 /**
@@ -67,10 +92,9 @@ const getChildAnimationName = (string, fieldToTest) => {
 const getCleanRules = (rules, key, value) => {
   const cleanRules = getOwnPropertyNames(value).reduce((cleanValues, valueKey) => {
     if (!isPlainObject(value[valueKey])) {
-      return {
-        ...cleanValues,
+      return assign(cleanValues, {
         [valueKey]: value[valueKey]
-      };
+      });
     }
 
     return cleanValues;
@@ -157,7 +181,7 @@ const getKeyframeRules = (rules, key, value, {id}) => {
  * @returns {object}
  */
 const getMediaQueryRules = (rules, value, {hashSelectors, id, root = ''}) => {
-  const styles = root === '' ? value : {
+  const styles = !root ? value : {
     [root]: value
   };
   const newOptions = {
@@ -199,11 +223,11 @@ const getRuleType = (key) => {
  */
 const getSortedKeys = (object) => {
   return getOwnPropertyNames(object).sort((previousValue, currentValue) => {
-    if (KEYFRAMES_REGEXP.test(previousValue)) {
+    if (isType(KEYFRAMES_REGEXP, previousValue) || isType(FONT_FACE_REGEXP, previousValue)) {
       return -1;
     }
 
-    if (KEYFRAMES_REGEXP.test(currentValue)) {
+    if (isType(KEYFRAMES_REGEXP, currentValue) || isType(FONT_FACE_REGEXP, currentValue)) {
       return 1;
     }
 
@@ -272,33 +296,13 @@ const getFlattenedRules = (styles, options) => {
   return getSortedKeys(styles).reduce((rules, key) => {
     let child = styles[key];
 
-    if (hashSelectors && child.hasOwnProperty('animation')) {
-      for (let keyframe in keyframes) {
-        const animation = getChildAnimationName(child.animation, keyframe);
-
-        if (child.animation !== animation) {
-          child = {
-            ...child,
-            animation
-          };
-          
-          break;
-        }
+    if (hashSelectors) {
+      if (child.hasOwnProperty('animation')) {
+        child = getAnimationName(child, 'animation');
       }
-    }
 
-    if (hashSelectors && child.hasOwnProperty('animationName')) {
-      for (let keyframe in keyframes) {
-        const animationName = getChildAnimationName(child.animationName, keyframe);
-
-        if (child.animationName !== animationName) {
-          child = {
-            ...child,
-            animationName
-          };
-          
-          break;
-        }
+      if (child.hasOwnProperty('animationName')) {
+        child = getAnimationName(child, 'animationName');
       }
     }
 
@@ -326,6 +330,7 @@ const getFlattenedRules = (styles, options) => {
   }, {});
 };
 
+export {getAnimationName};
 export {getChildAnimationName};
 export {getCleanRules};
 export {getFlattenedRules};
