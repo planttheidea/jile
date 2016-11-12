@@ -75,7 +75,7 @@ const styles = jile({
 
 // or give it some options
 const options = {
-    id: 'my-magical-component,
+    id: 'my-magical-component',
     sourceMap: false
 };
 
