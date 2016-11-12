@@ -14,7 +14,7 @@ For those that have used both [CSS Modules](https://github.com/css-modules/css-m
 
 ```javascript
 import jile from 'jile';
-...
+
 const jileObject = jile({
   '.foo': {
     display: 'inline-block'
@@ -22,7 +22,7 @@ const jileObject = jile({
 });
 
 const styles = jileObject.selectors;
-...
+
 const ExampleComponent = () => {
   return (
     <div className={styles.foo}>
@@ -73,13 +73,17 @@ const styles = jile({
   }
 });
 
-// or give it a custom ID
+// or give it some options
+const options = {
+    id: 'my-magical-component,
+    sourceMap: false
+};
 
-const styles = jile('my-magical-component', {
+const styles = jile({
   '.basic': {
     display: 'inline-block'
   }
-});
+}, options);
 ```
 
 **Nested children**
