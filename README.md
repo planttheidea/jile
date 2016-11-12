@@ -17,7 +17,7 @@ import jile from 'jile';
 ...
 const jileObject = jile({
   '.foo': {
-    display: 'inline-block
+    display: 'inline-block'
   }
 });
 
