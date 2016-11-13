@@ -15,17 +15,23 @@ test('if getKeyframesPrefix returns valid prefix', (t) => {
   t.not(keyframesPrefix, '-moz-keyframes');
 });
 
-test('if prefix will prefix the styles passed to it', (t) => {
+test.serial('if prefix will prefix the styles passed to it', (t) => {
+  setPrefixerOptions({
+    userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36'
+  });
+
   const result = prefix({
     appearance: 'none'
   });
 
   t.deepEqual(result, {
-    WebkitApperance: 'none'
+    WebkitAppearance: 'none'
   });
+
+  setPrefixerOptions({});
 });
 
-test('if setPrefixerOptions sets userAgent and prefix provides prefixed values correctly',  (t) => {
+test.serial('if setPrefixerOptions sets userAgent and prefix provides prefixed values correctly',  (t) => {
   setPrefixerOptions({
     userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36'
   });

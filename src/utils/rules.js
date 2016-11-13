@@ -281,6 +281,26 @@ const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
 };
 
 /**
+ * remove all empty rules
+ *
+ * @param {Object} rules
+ * @returns {Object}
+ */
+const getOnlyPopulatedRules = (rules) => {
+  return getOwnPropertyNames(rules).reduce((finalRules, key) => {
+    const value = rules[key];
+
+    if (!getOwnPropertyNames(value).length) {
+      return finalRules;
+    }
+
+    return assign(finalRules, {
+      [key]: value
+    });
+  }, {});
+};
+
+/**
  * get the rules in a flattened format
  * 
  * @param {Object} styles
@@ -293,7 +313,7 @@ const getFlattenedRules = (styles, options) => {
     root = ''
   } = options;
 
-  return getSortedKeys(styles).reduce((rules, key) => {
+  const flattenedRules = getSortedKeys(styles).reduce((rules, key) => {
     let child = styles[key];
 
     if (hashSelectors) {
@@ -311,10 +331,10 @@ const getFlattenedRules = (styles, options) => {
         return merge(rules, {
           [key]: getMediaQueryRules(rules, child, options)
         });
-      
+
       case KEYFRAMES_TYPE:
         return merge(rules, getKeyframeRules(rules, key, child, options));
-      
+
       case PAGE_TYPE:
         if (root !== '') {
           throw new Error('@page declarations must be top-level, as they cannot be scoped.');
@@ -323,11 +343,13 @@ const getFlattenedRules = (styles, options) => {
         return merge(rules, {
           [key]: getCleanRules(rules, key, child)
         });
-      
+
       default:
         return getStandardRules(rules, child, key, options);
     }
   }, {});
+
+  return getOnlyPopulatedRules(flattenedRules);
 };
 
 export {getAnimationName};
@@ -338,5 +360,6 @@ export {getFullKey};
 export {getKeyframesPrefixedDeclarataion};
 export {getKeyframeRules};
 export {getMediaQueryRules};
+export {getOnlyPopulatedRules};
 export {getRuleType};
 export {getSortedKeys};

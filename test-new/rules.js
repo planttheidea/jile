@@ -1,7 +1,22 @@
 import test from 'ava';
+import sinon from 'sinon';
 
 import {
-  getFlattenedRules
+  getRules
 } from 'src/rules';
 
-test.todo('getFlattenedRules');
+import * as rulesUtils from 'src/utils/rules';
+
+import {
+  DEFAULT_OPTIONS
+} from 'src/utils/constants';
+
+test('if getRules calls getFlattenedRules', (t) => {
+  const stub = sinon.stub(rulesUtils, 'getFlattenedRules');
+
+  getRules({}, {});
+
+  t.true(stub.calledOnce);
+
+  stub.restore();
+});
