@@ -106,6 +106,11 @@ const getHashedSelector = (originalSelector, id) => {
  * @returns {string}
  */
 const toKebabCase = (string) => {
+  // opera has precursor of capital O, so handle that scenario
+  if (string.charAt(0) === 'O') {
+    string = `o${string.slice(1)}`;
+  }
+
   return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 };
 

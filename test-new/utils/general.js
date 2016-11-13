@@ -82,4 +82,9 @@ test('if toKebabCase correctly converts camelCase to kebab-case', (t) => {
   const expectedResult = 'some-camel-case-word';
 
   t.is(result, expectedResult);
+
+  const operaResult = toKebabCase('OAppearance');
+  const expectedOperaResult = 'o-appearance';
+
+  t.is(operaResult, expectedOperaResult);
 });

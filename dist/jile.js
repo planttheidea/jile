@@ -128,7 +128,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * pass-through to setPrefixer method
 	 *
-	 * @type {setPrefixer}
+	 * @params {Array<*>} args
+	 * @returns {*}
 	 */
 	
 	
@@ -137,7 +138,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	// utils
 	// polyfills
-	jile.setPrefixerOptions = _prefix.setPrefixerOptions;
+	jile.setPrefixerOptions = function () {
+	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	    args[_key] = arguments[_key];
+	  }
+	
+	  return _prefix.setPrefixerOptions.apply(undefined, args);
+	};
 	
 	exports.default = jile;
 	module.exports = exports['default'];
@@ -644,6 +651,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {string}
 	 */
 	var toKebabCase = function toKebabCase(string) {
+	  // opera has precursor of capital O, so handle that scenario
+	  if (string.charAt(0) === 'O') {
+	    string = 'o' + string.slice(1);
+	  }
+	
 	  return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 	};
 	
@@ -717,14 +729,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OPTIONS_KEYS = [].concat(_toConsumableArray(keys(DEFAULT_OPTIONS)), ['id']);
 	
 	// properties that can have unitless values
-	var UNITLESS_PROPERTIES = ['columnCount', 'columns', 'counterIncrement', 'counterReset', 'flexGrow', 'flexShrink', 'fontWeight', 'lineHeight', 'opacity', 'order', 'pitchRange', 'richness', 'stress', 'volume', 'zIndex'];
+	var UNITLESS_PROPERTIES = ['column-count', 'columnCount', 'columns', 'counter-increment', 'counter-reset', 'counterIncrement', 'counterReset', 'flex-grow', 'flex-shrink', 'flexGrow', 'flexShrink', 'font-weight', 'fontWeight', 'line-height', 'lineHeight', 'opacity', 'order', 'pitch-range', 'pitchRange', 'richness', 'stress', 'volume', 'z-index', 'zIndex'];
 	
 	// regexp objects
 	var FONT_FACE_REGEXP = /@font-face/;
 	var GLOBAL_REPLACEMENT_REGEXP = /global__([0-9]+)/;
 	var GLOBAL_SELECTOR_REGEXP = /:global\((.*?)\)/;
 	var HASH_SELECTOR_REGEXP = /(\.|#)([_a-zA-Z][_a-zA-z0-9-]+)/g;
-	var JILE_HASH_REGEXP = /jile__([_A-Za-z0-9-]+)__([0-9]+)/;
+	var JILE_HASH_REGEXP = /jile__(.*)__([0-9]+)/;
 	var KEYFRAMES_REGEXP = /@keyframes/;
 	var KEYFRAMES_FOLLOWED_BY_NAME_REGEXP = /(@keyframes\s+)(\w+)/;
 	var MEDIA_QUERY_REGEXP = /@media/;
@@ -1203,16 +1215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.getSortedKeys = exports.getRuleType = exports.getMediaQueryRules = exports.getKeyframeRules = exports.getKeyframesPrefixedDeclarataion = exports.getFullKey = exports.getFlattenedRules = exports.getCleanRules = exports.getChildAnimationName = undefined;
-	
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; // external dependencies
-	
-	
-	// utils
-	
-	
-	// constants
-	
+	exports.getSortedKeys = exports.getRuleType = exports.getOnlyPopulatedRules = exports.getMediaQueryRules = exports.getKeyframeRules = exports.getKeyframesPrefixedDeclarataion = exports.getFullKey = exports.getFlattenedRules = exports.getCleanRules = exports.getChildAnimationName = exports.getAnimationName = exports.keyframes = undefined;
 	
 	var _isNaN = __webpack_require__(20);
 	
@@ -1236,7 +1239,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; } // external dependencies
+	
+	
+	// utils
+	
+	
+	// constants
+	
 	
 	var keyframes = {};
 	
@@ -1246,35 +1256,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {string} string
 	 * @param {string} fieldToTest
+	 * @param {Object} keyframesMap=keyframes
 	 * @returns {string}
 	 */
 	var getChildAnimationName = function getChildAnimationName(string, fieldToTest) {
-	  var regexp = new RegExp(fieldToTest);
+	  var keyframesMap = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : keyframes;
 	
 	  /**
 	   * if its already been hashed before, just return it
 	   */
-	  if (_constants.JILE_HASH_REGEXP.test(string)) {
+	  if ((0, _is.isType)(_constants.JILE_HASH_REGEXP, string)) {
 	    return string;
 	  }
 	
+	  var regexp = new RegExp(fieldToTest);
+	
 	  return string.replace(regexp, function (value) {
-	    return keyframes[value] || value;
+	    return keyframesMap[value] || value;
 	  });
+	};
+	
+	/**
+	 * get the cleaned animationName for the given object
+	 *
+	 * @param {Object} object
+	 * @param {string} property
+	 * @param {Object} keyframesMap=keyframes
+	 * @returns {Object}
+	 */
+	var getAnimationName = function getAnimationName(object, property) {
+	  var keyframesMap = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : keyframes;
+	
+	  for (var keyframe in keyframesMap) {
+	    var animation = getChildAnimationName(object[property], keyframe, keyframesMap);
+	
+	    if (object[property] !== animation) {
+	      object = (0, _constants.assign)(object, {
+	        animation: animation
+	      });
+	
+	      break;
+	    }
+	  }
+	
+	  return object;
 	};
 	
 	/**
 	 * merge prefixes values with rules object
 	 *
-	 * @param {object} rules
-	 * @param {string} key
-	 * @param {object} value
-	 * @returns {object}
+	 * @param {Object} rules
+	 * @returns {Object}
 	 */
-	var getCleanRules = function getCleanRules(rules, key, value) {
-	  var cleanRules = (0, _constants.getOwnPropertyNames)(value).reduce(function (cleanValues, valueKey) {
-	    if (!(0, _isPlainObject2.default)(value[valueKey])) {
-	      return _extends({}, cleanValues, _defineProperty({}, valueKey, value[valueKey]));
+	var getCleanRules = function getCleanRules(rules) {
+	  var cleanRules = (0, _constants.getOwnPropertyNames)(rules).reduce(function (cleanValues, key) {
+	    if (!(0, _isPlainObject2.default)(rules[key])) {
+	      return (0, _constants.assign)(cleanValues, _defineProperty({}, key, rules[key]));
 	    }
 	
 	    return cleanValues;
@@ -1322,13 +1359,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * merge keyframe with list of rules, prefixing
 	 * all values in increment declarations
 	 *
-	 * @param {object} rules
 	 * @param {string} key
-	 * @param {object} value
+	 * @param {Object} value
 	 * @param {string} id
-	 * @returns {object}
+	 * @returns {Object}
 	 */
-	var getKeyframeRules = function getKeyframeRules(rules, key, value, _ref) {
+	var getKeyframeRules = function getKeyframeRules(key, value, _ref) {
 	  var id = _ref.id;
 	
 	  var prefixedDeclaration = getKeyframesPrefixedDeclarataion(key, id);
@@ -1345,23 +1381,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	/**
-	 * merge media query (recursively, if applicable) styles
-	 * with existing rules
+	 * get the media query (recursively, if applicable) style rules
 	 *
-	 * @param {object} rules
-	 * @param {object} value
+	 * @param {Object} value
 	 * @param {boolean} hashSelectors
 	 * @param {string} id
 	 * @param {string} root=''
-	 * @returns {object}
+	 * @returns {Object}
 	 */
-	var getMediaQueryRules = function getMediaQueryRules(rules, value, _ref3) {
+	var getMediaQueryRules = function getMediaQueryRules(value, _ref3) {
 	  var hashSelectors = _ref3.hashSelectors,
 	      id = _ref3.id,
 	      _ref3$root = _ref3.root,
 	      root = _ref3$root === undefined ? '' : _ref3$root;
 	
-	  var styles = root === '' ? value : _defineProperty({}, root, value);
+	  var styles = !root ? value : _defineProperty({}, root, value);
 	  var newOptions = {
 	    hashSelectors: hashSelectors,
 	    id: id,
@@ -1401,11 +1435,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var getSortedKeys = function getSortedKeys(object) {
 	  return (0, _constants.getOwnPropertyNames)(object).sort(function (previousValue, currentValue) {
-	    if (_constants.KEYFRAMES_REGEXP.test(previousValue)) {
+	    if ((0, _is.isType)(_constants.KEYFRAMES_REGEXP, previousValue) || (0, _is.isType)(_constants.FONT_FACE_REGEXP, previousValue)) {
 	      return -1;
 	    }
 	
-	    if (_constants.KEYFRAMES_REGEXP.test(currentValue)) {
+	    if ((0, _is.isType)(_constants.KEYFRAMES_REGEXP, currentValue) || (0, _is.isType)(_constants.FONT_FACE_REGEXP, currentValue)) {
 	      return 1;
 	    }
 	
@@ -1438,7 +1472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var fullKey = getFullKey(root, key);
 	
-	  var newRules = (0, _merge6.default)(rules, _defineProperty({}, fullKey, getCleanRules(rules, fullKey, child)));
+	  var newRules = (0, _merge6.default)(rules, _defineProperty({}, fullKey, getCleanRules(child)));
 	
 	  if (!isChildObject) {
 	    return newRules;
@@ -1461,6 +1495,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	/**
+	 * remove all empty rules
+	 *
+	 * @param {Object} rules
+	 * @returns {Object}
+	 */
+	var getOnlyPopulatedRules = function getOnlyPopulatedRules(rules) {
+	  return (0, _constants.getOwnPropertyNames)(rules).reduce(function (finalRules, key) {
+	    var value = rules[key];
+	
+	    if (!(0, _constants.getOwnPropertyNames)(value).length) {
+	      return finalRules;
+	    }
+	
+	    return (0, _constants.assign)(finalRules, _defineProperty({}, key, value));
+	  }, {});
+	};
+	
+	/**
 	 * get the rules in a flattened format
 	 * 
 	 * @param {Object} styles
@@ -1473,57 +1525,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	      root = _options$root === undefined ? '' : _options$root;
 	
 	
-	  return getSortedKeys(styles).reduce(function (rules, key) {
+	  var flattenedRules = getSortedKeys(styles).reduce(function (rules, key) {
 	    var child = styles[key];
 	
-	    if (hashSelectors && child.hasOwnProperty('animation')) {
-	      for (var keyframe in keyframes) {
-	        var animation = getChildAnimationName(child.animation, keyframe);
-	
-	        if (child.animation !== animation) {
-	          child = _extends({}, child, {
-	            animation: animation
-	          });
-	
-	          break;
-	        }
+	    if (hashSelectors) {
+	      if (child.hasOwnProperty('animation')) {
+	        child = getAnimationName(child, 'animation');
 	      }
-	    }
 	
-	    if (hashSelectors && child.hasOwnProperty('animationName')) {
-	      for (var _keyframe in keyframes) {
-	        var animationName = getChildAnimationName(child.animationName, _keyframe);
-	
-	        if (child.animationName !== animationName) {
-	          child = _extends({}, child, {
-	            animationName: animationName
-	          });
-	
-	          break;
-	        }
+	      if (child.hasOwnProperty('animationName')) {
+	        child = getAnimationName(child, 'animationName');
 	      }
 	    }
 	
 	    switch (getRuleType(key)) {
 	      case _constants.MEDIA_QUERY_TYPE:
-	        return (0, _merge6.default)(rules, _defineProperty({}, key, getMediaQueryRules(rules, child, options)));
+	        return (0, _merge6.default)(rules, _defineProperty({}, key, getMediaQueryRules(child, options)));
 	
 	      case _constants.KEYFRAMES_TYPE:
-	        return (0, _merge6.default)(rules, getKeyframeRules(rules, key, child, options));
+	        return (0, _merge6.default)(rules, getKeyframeRules(key, child, options));
 	
 	      case _constants.PAGE_TYPE:
 	        if (root !== '') {
 	          throw new Error('@page declarations must be top-level, as they cannot be scoped.');
 	        }
 	
-	        return (0, _merge6.default)(rules, _defineProperty({}, key, getCleanRules(rules, key, child)));
+	        return (0, _merge6.default)(rules, _defineProperty({}, key, getCleanRules(child)));
 	
 	      default:
 	        return getStandardRules(rules, child, key, options);
 	    }
 	  }, {});
+	
+	  return getOnlyPopulatedRules(flattenedRules);
 	};
 	
+	exports.keyframes = keyframes;
+	exports.getAnimationName = getAnimationName;
 	exports.getChildAnimationName = getChildAnimationName;
 	exports.getCleanRules = getCleanRules;
 	exports.getFlattenedRules = getFlattenedRules;
@@ -1531,6 +1569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.getKeyframesPrefixedDeclarataion = getKeyframesPrefixedDeclarataion;
 	exports.getKeyframeRules = getKeyframeRules;
 	exports.getMediaQueryRules = getMediaQueryRules;
+	exports.getOnlyPopulatedRules = getOnlyPopulatedRules;
 	exports.getRuleType = getRuleType;
 	exports.getSortedKeys = getSortedKeys;
 
@@ -3144,7 +3183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    switch ((0, _rules.getRuleType)(selector)) {
 	      case _constants.KEYFRAMES_TYPE:
-	        return cssString + (0, _stylesheet.getKeyframesBlock)(selector, rule, options, selectorMap);
+	        return '' + cssString + (0, _stylesheet.getKeyframesBlock)(selector, rule, options, selectorMap);
 	
 	      case _constants.MEDIA_QUERY_TYPE:
 	        var _getMediaQueryBlockAn = (0, _stylesheet.getMediaQueryBlockAndSelectorMap)(selector, rule, options),
@@ -3153,7 +3192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        (0, _constants.assign)(selectorMap, mediaQuerySelectorMap);
 	
-	        return cssString + mediaQueryBlock;
+	        return '' + cssString + mediaQueryBlock;
 	
 	      default:
 	        var _getStandardBlockAndS = (0, _stylesheet.getStandardBlockAndSelectorMap)(selector, rule, options, (0, _is.isType)(_constants.FONT_FACE_REGEXP, selector)),
@@ -3162,7 +3201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        (0, _constants.assign)(selectorMap, standardSelectorMap);
 	
-	        return cssString + standardBlock;
+	        return '' + cssString + standardBlock;
 	    }
 	  }, '');
 	
@@ -3191,7 +3230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.sortKeyframesKeys = exports.shouldApplyPxSuffix = exports.minify = exports.getVendorPrefix = exports.getStandardBlockAndSelectorMap = exports.getMediaQueryBlockAndSelectorMap = exports.getNewline = exports.getKeyframesBlock = exports.getIndent = exports.hashKeyframesName = exports.buildPropertyValues = undefined;
+	exports.sortKeyframesKeys = exports.shouldApplyPxSuffix = exports.minify = exports.getVendorPrefix = exports.getStandardBlockAndSelectorMap = exports.getNewline = exports.getMediaQueryBlockAndSelectorMap = exports.getKeyframesBlock = exports.getIndent = exports.getHashedKeyframesName = exports.buildPropertyValues = undefined;
 	
 	var _isNumber = __webpack_require__(21);
 	
@@ -3325,7 +3364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Object} selectorMap
 	 * @returns {string}
 	 */
-	var hashKeyframesName = function hashKeyframesName(selector, id, selectorMap) {
+	var getHashedKeyframesName = function getHashedKeyframesName(selector, id, selectorMap) {
 	  var pureValue = void 0,
 	      hashedValue = void 0,
 	      mappedValue = void 0;
@@ -3388,7 +3427,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var hashSelectors = options.hashSelectors,
 	      id = options.id;
 	
-	  var hashedSelector = hashSelectors ? hashKeyframesName(selector, id, selectorMap) : selector;
+	  var hashedSelector = hashSelectors ? getHashedKeyframesName(selector, id, selectorMap) : selector;
 	
 	  var textContent = getNewline();
 	
@@ -3539,11 +3578,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	exports.buildPropertyValues = buildPropertyValues;
-	exports.hashKeyframesName = hashKeyframesName;
+	exports.getHashedKeyframesName = getHashedKeyframesName;
 	exports.getIndent = getIndent;
 	exports.getKeyframesBlock = getKeyframesBlock;
-	exports.getNewline = getNewline;
 	exports.getMediaQueryBlockAndSelectorMap = getMediaQueryBlockAndSelectorMap;
+	exports.getNewline = getNewline;
 	exports.getStandardBlockAndSelectorMap = getStandardBlockAndSelectorMap;
 	exports.getVendorPrefix = getVendorPrefix;
 	exports.minify = minify;

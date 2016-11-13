@@ -127,7 +127,7 @@ const buildPropertyValues = (property, rule, indent = 2) => {
  * @param {Object} selectorMap
  * @returns {string}
  */
-const hashKeyframesName = (selector, id, selectorMap) => {
+const getHashedKeyframesName = (selector, id, selectorMap) => {
   let pureValue, hashedValue, mappedValue;
 
   return selector.replace(KEYFRAMES_FOLLOWED_BY_NAME_REGEXP, (value, matchedProperty) => {
@@ -189,7 +189,7 @@ const getKeyframesBlock = (selector, rule, options, selectorMap) => {
     hashSelectors,
     id
   } = options;
-  const hashedSelector = hashSelectors ? hashKeyframesName(selector, id, selectorMap) : selector;
+  const hashedSelector = hashSelectors ? getHashedKeyframesName(selector, id, selectorMap) : selector;
 
   let textContent = getNewline();
 
@@ -353,7 +353,7 @@ const getStandardBlockAndSelectorMap = (selector, rule, options, isSelectorFontF
 };
 
 export {buildPropertyValues};
-export {hashKeyframesName};
+export {getHashedKeyframesName};
 export {getIndent};
 export {getKeyframesBlock};
 export {getMediaQueryBlockAndSelectorMap};

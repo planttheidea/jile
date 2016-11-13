@@ -2,6 +2,8 @@ import test from 'ava';
 import sinon from 'sinon';
 
 import {
+  keyframes,
+
   getAnimationName,
   getChildAnimationName,
   getCleanRules,
@@ -25,9 +27,53 @@ import {
 
 import * as prefixUtils from 'src/utils/prefix';
 
-test.todo('getAnimationName');
-test.todo('getChildAnimationName');
-test.todo('getCleanRules');
+test('if getAnimationName will return a cleaned object', (t) => {
+  const keyframesMap = {
+    bar: 'baz'
+  };
+
+  const object = {
+    animation: 'bar 200ms'
+  };
+  const property = 'animation';
+
+  const result = getAnimationName(object, property, keyframesMap);
+
+  t.deepEqual(result, {
+    animation: 'baz 200ms'
+  })
+});
+
+test('if getChildAnimationName will return the jile name but replace all else', (t) => {
+  const keyframesMap = {
+    foo: 'bar'
+  };
+
+  const jileName = 'jile__foo__12345';
+
+  const sameResult = getChildAnimationName(jileName, 'foo', keyframesMap);
+
+  t.is(sameResult, jileName);
+
+  const differentResult = getChildAnimationName('foo_bar_baz', 'foo', keyframesMap);
+
+  t.is(differentResult, 'bar_bar_baz');
+});
+
+test('if getCleanRules only returns rules that do not have plain objects as values', (t) => {
+  const rules = {
+    foo: {},
+    bar: 'bar',
+    baz: 123
+  };
+
+  const result = getCleanRules(rules);
+
+  t.deepEqual(result, {
+    bar: 'bar',
+    baz: 123
+  });
+});
 
 test('if getFlattenedRules returns a flattened object of styles', (t) => {
   const styles = {
@@ -79,8 +125,59 @@ test('if getKeyframesPrefixedDeclarataion creates the correct keyframes value', 
   stub.restore();
 });
 
-test.todo('getKeyframeRules');
-test.todo('getMediaQueryRules');
+test('if getKeyframeRules correctly builds the keyframe style object', (t) => {
+  const key = '@keyframes foo';
+  const value = {
+    from: {
+      color: 'red'
+    },
+    to: {
+      color: 'blue'
+    }
+  };
+  const id = 'bar';
+
+  const result = getKeyframeRules(key, value, {id});
+
+  t.deepEqual(result, {
+    [key]: value
+  })
+});
+
+test('if getMediaQueryRules returns the same object when root is top-level', (t) => {
+  const value = {
+    '.foo': {
+      display: 'block'
+    }
+  };
+  const options = {
+    hashSelectors: true,
+    id: 'foo'
+  };
+
+  const result = getMediaQueryRules(value, options);
+
+  t.deepEqual(result, value);
+});
+
+test('if getMediaQueryRules returns the a nested object when root is not top-level', (t) => {
+  const value = {
+    '.foo': {
+      display: 'block'
+    }
+  };
+  const options = {
+    hashSelectors: true,
+    id: 'foo',
+    root: '@media print'
+  };
+
+  const result = getMediaQueryRules(value, options);
+
+  t.deepEqual(result, {
+    '@media print': value
+  });
+});
 
 test('if getOnlyPopulatedRules removes rules that are empty', (t) => {
   const rules = {

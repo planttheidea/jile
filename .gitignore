@@ -36,6 +36,7 @@ jspm_packages
 .node_repl_history
 
 # Other directories
+.nyc_output
 lib
 
 # Created by .ignore support plugin (hsz.mobi)

@@ -20,20 +20,29 @@ const OPTIONS_KEYS = [
 
 // properties that can have unitless values
 const UNITLESS_PROPERTIES = [
+  'column-count',
   'columnCount',
   'columns',
+  'counter-increment',
+  'counter-reset',
   'counterIncrement',
   'counterReset',
+  'flex-grow',
+  'flex-shrink',
   'flexGrow',
   'flexShrink',
+  'font-weight',
   'fontWeight',
+  'line-height',
   'lineHeight',
   'opacity',
   'order',
+  'pitch-range',
   'pitchRange',
   'richness',
   'stress',
   'volume',
+  'z-index',
   'zIndex'
 ];
 
@@ -42,7 +51,7 @@ const FONT_FACE_REGEXP = /@font-face/;
 const GLOBAL_REPLACEMENT_REGEXP = /global__([0-9]+)/;
 const GLOBAL_SELECTOR_REGEXP = /:global\((.*?)\)/;
 const HASH_SELECTOR_REGEXP = /(\.|#)([_a-zA-Z][_a-zA-z0-9-]+)/g;
-const JILE_HASH_REGEXP = /jile__([_A-Za-z0-9-]+)__([0-9]+)/;
+const JILE_HASH_REGEXP = /jile__(.*)__([0-9]+)/;
 const KEYFRAMES_REGEXP = /@keyframes/;
 const KEYFRAMES_FOLLOWED_BY_NAME_REGEXP = /(@keyframes\s+)(\w+)/;
 const MEDIA_QUERY_REGEXP = /@media/;

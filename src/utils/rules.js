@@ -41,9 +41,10 @@ let keyframes = {};
  *
  * @param {string} string
  * @param {string} fieldToTest
+ * @param {Object} keyframesMap=keyframes
  * @returns {string}
  */
-const getChildAnimationName = (string, fieldToTest) => {
+const getChildAnimationName = (string, fieldToTest, keyframesMap = keyframes) => {
   /**
    * if its already been hashed before, just return it
    */
@@ -54,7 +55,7 @@ const getChildAnimationName = (string, fieldToTest) => {
   const regexp = new RegExp(fieldToTest);
 
   return string.replace(regexp, (value) => {
-    return keyframes[value] || value;
+    return keyframesMap[value] || value;
   });
 };
 
@@ -63,11 +64,12 @@ const getChildAnimationName = (string, fieldToTest) => {
  *
  * @param {Object} object
  * @param {string} property
+ * @param {Object} keyframesMap=keyframes
  * @returns {Object}
  */
-const getAnimationName = (object, property) => {
-  for (let keyframe in keyframes) {
-    const animation = getChildAnimationName(object[property], keyframe);
+const getAnimationName = (object, property, keyframesMap = keyframes) => {
+  for (let keyframe in keyframesMap) {
+    const animation = getChildAnimationName(object[property], keyframe, keyframesMap);
 
     if (object[property] !== animation) {
       object = assign(object, {
@@ -84,16 +86,14 @@ const getAnimationName = (object, property) => {
 /**
  * merge prefixes values with rules object
  *
- * @param {object} rules
- * @param {string} key
- * @param {object} value
- * @returns {object}
+ * @param {Object} rules
+ * @returns {Object}
  */
-const getCleanRules = (rules, key, value) => {
-  const cleanRules = getOwnPropertyNames(value).reduce((cleanValues, valueKey) => {
-    if (!isPlainObject(value[valueKey])) {
+const getCleanRules = (rules) => {
+  const cleanRules = getOwnPropertyNames(rules).reduce((cleanValues, key) => {
+    if (!isPlainObject(rules[key])) {
       return assign(cleanValues, {
-        [valueKey]: value[valueKey]
+        [key]: rules[key]
       });
     }
 
@@ -144,13 +144,12 @@ const getKeyframesPrefixedDeclarataion = (key, id) => {
  * merge keyframe with list of rules, prefixing
  * all values in increment declarations
  *
- * @param {object} rules
  * @param {string} key
- * @param {object} value
+ * @param {Object} value
  * @param {string} id
- * @returns {object}
+ * @returns {Object}
  */
-const getKeyframeRules = (rules, key, value, {id}) => {
+const getKeyframeRules = (key, value, {id}) => {
   const prefixedDeclaration = getKeyframesPrefixedDeclarataion(key, id);
 
   const keyframeRules = getOwnPropertyNames(value).reduce((cleanValues, valueKey) => {
@@ -170,17 +169,15 @@ const getKeyframeRules = (rules, key, value, {id}) => {
 };
 
 /**
- * merge media query (recursively, if applicable) styles
- * with existing rules
+ * get the media query (recursively, if applicable) style rules
  *
- * @param {object} rules
- * @param {object} value
+ * @param {Object} value
  * @param {boolean} hashSelectors
  * @param {string} id
  * @param {string} root=''
- * @returns {object}
+ * @returns {Object}
  */
-const getMediaQueryRules = (rules, value, {hashSelectors, id, root = ''}) => {
+const getMediaQueryRules = (value, {hashSelectors, id, root = ''}) => {
   const styles = !root ? value : {
     [root]: value
   };
@@ -257,7 +254,7 @@ const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
   const fullKey = getFullKey(root, key);
 
   let newRules = merge(rules, {
-    [fullKey]: getCleanRules(rules, fullKey, child)
+    [fullKey]: getCleanRules(child)
   });
 
   if (!isChildObject) {
@@ -329,11 +326,11 @@ const getFlattenedRules = (styles, options) => {
     switch (getRuleType(key)) {
       case MEDIA_QUERY_TYPE:
         return merge(rules, {
-          [key]: getMediaQueryRules(rules, child, options)
+          [key]: getMediaQueryRules(child, options)
         });
 
       case KEYFRAMES_TYPE:
-        return merge(rules, getKeyframeRules(rules, key, child, options));
+        return merge(rules, getKeyframeRules(key, child, options));
 
       case PAGE_TYPE:
         if (root !== '') {
@@ -341,7 +338,7 @@ const getFlattenedRules = (styles, options) => {
         }
 
         return merge(rules, {
-          [key]: getCleanRules(rules, key, child)
+          [key]: getCleanRules(child)
         });
 
       default:
@@ -352,6 +349,7 @@ const getFlattenedRules = (styles, options) => {
   return getOnlyPopulatedRules(flattenedRules);
 };
 
+export {keyframes};
 export {getAnimationName};
 export {getChildAnimationName};
 export {getCleanRules};

@@ -45,7 +45,7 @@ const getCssAndSelectorMap = (rules, options) => {
 
     switch (getRuleType(selector)) {
       case KEYFRAMES_TYPE:
-        return cssString + getKeyframesBlock(selector, rule, options, selectorMap);
+        return `${cssString}${getKeyframesBlock(selector, rule, options, selectorMap)}`;
 
       case MEDIA_QUERY_TYPE:
         const {
@@ -55,7 +55,7 @@ const getCssAndSelectorMap = (rules, options) => {
 
         assign(selectorMap, mediaQuerySelectorMap);
 
-        return cssString + mediaQueryBlock;
+        return `${cssString}${mediaQueryBlock}`;
 
       default:
         const {
@@ -65,7 +65,7 @@ const getCssAndSelectorMap = (rules, options) => {
 
         assign(selectorMap, standardSelectorMap);
 
-        return cssString + standardBlock;
+        return `${cssString}${standardBlock}`;
     }
   }, '');
 
