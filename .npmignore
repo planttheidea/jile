@@ -1,11 +1,13 @@
 .idea
-example
+.nyc_output
+coverage
+DEV_ONLY
 node_modules
 src
 test
 .babelrc
 .eslintrc
 .gitignore
-webpack.config.App.js
+webpack.config.dev.js
 webpack.config.js
 webpack.config.minified.js

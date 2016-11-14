@@ -7,21 +7,18 @@ import {
 
 import jile from '../src';
 
-const GLOBAL_STYLES = {
-  '.container': {
-    backgroundColor: 'yellow',
-    height: '100vh'
-  }
-};
 const SCOPED_STYLES = {
   'html, body': {
     margin: 0,
     padding: 0
   },
+
   '.selector': {
     display: 'inline-block'
   },
+
   '.parent': {
+    appearance: 'none',
     fontSize: 18,
     padding: 15,
 
@@ -103,9 +100,21 @@ const SCOPED_STYLES = {
   }
 };
 
-jile('universal-styles', GLOBAL_STYLES, false);
+const jileObject = jile(SCOPED_STYLES);
 
-const styles = jile(SCOPED_STYLES);
+const styles = jileObject.selectors;
+
+const GLOBAL_STYLES = {
+  '.container': {
+    backgroundColor: 'yellow',
+    height: '100vh'
+  }
+};
+
+jile(GLOBAL_STYLES, {
+  hashSelectors: false,
+  id: 'universal-styles'
+});
 
 class App extends Component {
   render() {
@@ -122,10 +131,18 @@ class App extends Component {
             I am crazy animated stuffz. Look at me! Wooooo...
           </div>
         </div>
+
+        <div className={styles.selector}>
+          I am inline-block.
+        </div>
       </div>
     );
   }
 }
+
+setTimeout(() => {
+  jileObject.remove();
+}, 3000);
 
 const div = document.createElement('div');
 

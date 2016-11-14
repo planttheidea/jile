@@ -1,4 +1,7 @@
-# jile CHANGELOG
+# jile changelog
+
+#### 2.0.0
+* Rewritten for speed, extensibility, and more options
 
 #### 1.3.0
 * Replace hashing mechanism to be simple bitwise operation (performance)

@@ -2,34 +2,69 @@
 
 Manage your styles in JavaScript with the full power of CSS.
 
+#### Table of contents
+* [Installation](#installation)
+* [Usage](#usage)
+* [How it works](#how-it-works)
+* [Why](#why)
+* [Options](#options)
+* [Nested styles](#nested-styles)
+* [Namespaced declarations](#namespaced-declarations)
+* [Global selectors](#global-selectors)
+* [Global stylesheets](#global-stylesheets)
+* [Prefixing](#prefixing)
+* [Managing a jile sheet](#managing-a-jile-sheet)
+* [Development](#development)
+
 #### Installation
 
-    $ npm i jile --save
+```
+$ npm i jile --save
+```
   
 #### Usage
 
 For those that have used both [CSS Modules](https://github.com/css-modules/css-modules) and [inline styles](https://facebook.github.io/react/tips/inline-styles.html), this should feel quite natural.
 
-```
+```javascript
 import jile from 'jile';
-...
-const styles = jile({
-  '.selector': {
-    display: 'inline-block
+
+// create your styles as a plain object, with the CSS selector as the keys
+const styles = {
+  '.foo': {
+    display: 'inline-block'
+  },
+  '@media print': {
+    '.bar': {
+      display: 'none'
+    }
   }
-});
-...
+};
+
+// optionally provide object of options for the generation of the jile
+const options = {
+  id: 'my-custom-id'
+};
+
+// the jile instance returned will have metadata, such as the css, selectors, and the tag injected 
+const j = jile(styles, options);
+
+// usually you just want the selectors so you can use them in your view
+const selectors = j.selectors;
+
 const ExampleComponent = () => {
   return (
-    <div className={styles.selector}>
+    <div className={selectors.foo}>
       I have a scoped class Selector!
     </div>
   );
 };
 ```
+
 With output of:
-```
-<div class="jile__selector__2202820774">
+
+```javascript
+<div class="jile__foo__2202820774">
   I have a scoped class selector!
 </div>
 ```
@@ -42,42 +77,46 @@ Any styles that you declare in the object passed to the `jile` function are pars
 
 #### Why
 
-**...not inline styles?**
+*...not inline styles?*
 
 Inline styles have become popular again for a reason ... everything is in JavaScript so it is dynamic, specificity is not a concern, and prefixing is handled easily, without the need for proprietary method calls (Compass, for example). That said, inline styles can only provide a limited subset of CSS ... `@media` queries, `@keyframes`, psuedo-selectors, etc. are all unable to be done with pure inline styles. Libraries like [Radium](https://github.com/FormidableLabs/radium) help with some of these aspects, but it still is incomplete.
 
-**...not CSS Modules?**
+*...not CSS Modules?*
 
 CSS Modules solve the main problem that CSS has ... global everything. A lot of `jile` concepts are taken from CSS Modules, because you can leverage the full power of CSS while still scoping things to your component. That said, CSS adds another piece to your build process (more dependencies), and now requires consumers of your component to include a second reference (one for your JS, one for your CSS).
 
-**... not both?**
+*... not both?*
 
 This is the objective of `jile`, to combine the flexibility and power of CSS with the implementation simplicity of JS. It leverages a (hopefully) familiar syntax to make transitioning from styles to `jile`s quick and painless.
 
-#### Examples
+#### Options
 
-**Basic usage**
+The following values can be passed in the `options` object as the second parameter to `jile`:
 
-The keys you provide to your objects are the selectors that will be used, and you can get as wild with your selectors as you would like ... `#unique-container button > .crazy-stuff + i` will totally be respected.
+```javascript
+{
+    // should the tag be mounted upon creation | optional, defaults to true
+    autoMount: Boolean,
+    
+    // should the selectors be hashed | optional, defaults to true
+    hashSelectors: Boolean,
+    
+    // custom ID for the tag | optional, defaults to 'jile-stylesheet-{#}'
+    id: String, 
+    
+    // should the CSS be minified | optional, defaults to true when in production, false otherwise
+    minify: Boolean,
+    
+    // should the CSS have a sourceMap | optional, defaults to false when in production, true otherwise
+    sourceMap: Boolean
+}
 ```
-const styles = jile({
-  '.basic': {
-    display: 'inline-block'
-  }
-});
 
-// or give it a custom ID
-
-const styles = jile('my-magical-component', {
-  '.basic': {
-    display: 'inline-block'
-  }
-});
-```
-**Nested children**
+#### Nested styles
 
 Use the `&` before your child declarations to inherit from the parent.
-```
+
+```javascript
 const styles = jile({
   '.parent': {
     color: '#333',
@@ -95,8 +134,10 @@ const styles = jile({
   }
 });
 ```
-Translates to:
-```
+
+Creates the following output:
+
+```css
 .jile__parent__2351223888 {
   color: #333;
   font-size: 32px;
@@ -110,10 +151,12 @@ Translates to:
   display: block;
 }
 ```
-**@ declarations**
 
-You can use all forms of `@media` or `@keyframes`, even `@page`.
-```
+#### Namespaced declarations
+
+You can use all forms of `@` rules ... `@media`, `@keyframes`, even `@page`.
+
+```javascript
 const styles = jile({
   '@media screen and (max-width: 1000px)': {
     '.parent': {
@@ -141,8 +184,10 @@ const styles = jile({
   }
 });
 ```
+
 However, if you wanted to consolidate it, any `@media` declaration will inherit from the parent it is declared in:
-```
+
+```javascript
 const styles = jile({
   '.parent': {
     '@media screen and (max-width: 1000px)': {
@@ -168,10 +213,12 @@ const styles = jile({
   }
 });
 ```
+
 Both will produce the same CSS.
 
 `@font-face` declarations include a little magic, as the "bulletproof font face" rule requires a double-declaration of the `src` attribute.
-```
+
+```javascript
 const fontFaceStyles = jile({
     '@font-face': {
         fontFamily: 'WebFont',
@@ -181,8 +228,10 @@ const fontFaceStyles = jile({
     }
 });
 ```
+
 Creates the following output:
-```
+
+```css
 @font-face {
     font-family: WebFont;
     src: url("webfont.eot");
@@ -191,83 +240,85 @@ Creates the following output:
 ```
 The injected `.eot` above the regular declaration is only if you provide an `.eot` in the provided object as one of the `src` values, as the injected declaration is for IE9 compat mode where as the `#iefix` declaration is for standard IE.
 
-**Global selectors**
+#### Global selectors
 
 Sometimes you want to mix your scoped styles with your global styles, and you can easily do that with the `:global()` wrapper.
-```
+
+```javascript
 const styles = jile({
     ':global(.unhashed-selector).hashedSelector': {
         display: 'block'
     }
 });
 ```
-With output:
-```
+
+Creates the following output:
+
+```css
 .unhashed-selector.jile__hashedSelector__12527111 {
     display: block;
 }
 ```
 
-**Global stylesheets**
+#### Global stylesheets
 
 You can create global stylesheets too! You get the same output, just minus the hashing.
-```
+
+```javascript
 const globalStyles = {
     '.container': {
         height: '100vh'
     }
 };
 
-jile('global-styles', globalStyles, false);
+const options = {
+    hashSelectors: false
+};
+
+jile(globalStyles, options);
 ```
-Outputs:
-```
+
+Creates the following output:
+
+```css
 .container {
     height: 100vh;
 }
 ```
-The boolean parameter `false` following the styles object tells jile not to hash any selectors.
 
-**Just the styles, Jack.**
-
-By default `jile` will inject a `<style>` tag into your `document`'s `<head>`, however if you are building a universal app and want to handle the injection yourself, `noInject` is a convenience function that will return an object with both the CSS and the selectorMap.
-```
-const stylesObj = jile.noInject('still-can-have-custom-id', {
-  '.parent': {
-    display: 'block'
-  }
-});
-const css = stylesObj.css;
-const selectorMap = stylesObj.selectorMap;
-```
-
-**Prefixing**
+#### Prefixing
 
 All prefixing is handled by [inline-style-prefixer](https://github.com/rofrischmann/inline-style-prefixer) automatically, however if you want to customize the usage of the built-in prefixer, you can with the `setPrefixer` method.
-```
+
+```javascript
 jile.setPrefixer({
   userAgent: 'Mozilla/5.0 (Android 4.4; Mobile; rv:41.0) Gecko/41.0 Firefox/41.0'
 });
 ```
+
 If you going to customize the prefixer, it is advised you do before creating any stylesheets with it. The options passed to it are the same as the options passed to a `new Prefixer()` constructor in inline-styles-prefixer, so consult their documentation for the options available.
 
-**Removing a jile stylesheet**
+#### Managing a jile sheet
 
-This is a rare use case, as your styles all being scoped should prevent conflict, however if you do have a need to do it you can use the `remove` method.
-```
-jile.remove('id-you-assigned-before');
-```
-This requires an ID to be passed, so it is advised you create the original `jile` with a custom ID.
+The object that is returned when you create a `jile` has several methods for you to manage the tag if you so choose.
 
-#### Local Development
+* `jileObject.add()` will add the tag to the `document.head` if it is not already there
+* `jileObject.remove()` will remove the tag from the `document.head` if it is there
+* `jileObject.isMounted()` will return a `boolean` value for whether the `jile` tag is currently in the DOM or not
+* `jileObject.delete()` will run `jileObject.remove()` and also delete it from the cache of object
+
+#### Development
 
 Pretty standard stuff, pull down the repo and `npm i`. There are some built-in scripts:
-* `npm run build` = build dist/jile.js
-* `npm run build-minified` = build dist/jile.min.js
-* `npm run compile` = transpile files in src/* to lib/*
-* `npm run example` = runs example app on localhost:4000 (it's a playground, have fun)
-* `npm run prepublish` = runs the above `compile`, `build`, and `build-minified` scripts
-* `npm run test` = runs [AVA](https://github.com/avajs/ava) test scripts
-* `npm run test-timed` runes same scripts as `test`, but outputs completion times for each test
+* `build` = runs webpack to build dist/jile.js
+* `build:minified` = runs webpack to build dist/jile.min.js
+* `clean` => runs rimraf to remove `lib` and `dist` folders
+* `lint` => runs eslint on all files in `src`
+* `prepublish:compile` = runs `clean`, `lint`, `test`, `transpile`, `build`, and `build:minified` scripts
+* `start` = runs example app on localhost:3000 (it's a playground, have fun)
+* `test` = runs [AVA](https://github.com/avajs/ava) test scripts
+* `test:timed` runs `test`, but outputs completion times for each test
+* `test:watch` runs `test`, but with persistent watcher
+* `transpile` = transpiles files in `src` to `lib`
 
 Happy jiling!

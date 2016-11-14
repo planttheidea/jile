@@ -3,10 +3,10 @@ import test from 'ava';
 import {
   getKeyframesPrefix,
   prefix,
-  setPrefixer
-} from '../src/prefix';
+  setPrefixerOptions
+} from 'src/utils/prefix';
 
-test('getKeyframesPrefix returns valid prefix', (t) => {
+test('if getKeyframesPrefix returns valid prefix', (t) => {
   const keyframesPrefix = getKeyframesPrefix();
 
   t.is(keyframesPrefix, 'keyframes');
@@ -15,8 +15,24 @@ test('getKeyframesPrefix returns valid prefix', (t) => {
   t.not(keyframesPrefix, '-moz-keyframes');
 });
 
-test('setPrefix sets userAgent and prefix provides prefixed values correctly',  (t) => {
-  setPrefixer({
+test.serial('if prefix will prefix the styles passed to it', (t) => {
+  setPrefixerOptions({
+    userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36'
+  });
+
+  const result = prefix({
+    appearance: 'none'
+  });
+
+  t.deepEqual(result, {
+    WebkitAppearance: 'none'
+  });
+
+  setPrefixerOptions({});
+});
+
+test.serial('if setPrefixerOptions sets userAgent and prefix provides prefixed values correctly',  (t) => {
+  setPrefixerOptions({
     userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36'
   });
 
@@ -24,7 +40,7 @@ test('setPrefix sets userAgent and prefix provides prefixed values correctly',  
 
   t.is(webkitKeyframesPrefix, '-webkit-keyframes');
 
-  setPrefixer({
+  setPrefixerOptions({
     userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.28) Gecko/20120306 Firefox/5.0.1'
   });
 
