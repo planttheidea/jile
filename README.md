@@ -2,6 +2,20 @@
 
 Manage your styles in JavaScript with the full power of CSS.
 
+#### Table of contents
+* [Installation](#installation)
+* [Usage](#usage)
+* [How it works](#how-it-works)
+* [Why](#why)
+* [Options](#options)
+* [Nested styles](#nested-styles)
+* [Namespaced declarations](#namespaced-declarations)
+* [Global selectors](#global-selectors)
+* [Global stylesheets](#global-stylesheets)
+* [Prefixing](#prefixing)
+* [Managing a jile sheet](#managing-a-jile-sheet)
+* [Development](#development)
+
 #### Installation
 
 ```
@@ -59,30 +73,6 @@ CSS Modules solve the main problem that CSS has ... global everything. A lot of 
 *... not both?*
 
 This is the objective of `jile`, to combine the flexibility and power of CSS with the implementation simplicity of JS. It leverages a (hopefully) familiar syntax to make transitioning from styles to `jile`s quick and painless.
-
-#### Basic usage
-
-The keys you provide to your objects are the selectors that will be used, and you can get as wild with your selectors as you would like ... `#unique-container button > .crazy-stuff + i` will totally be respected.
-
-```javascript
-const styles = jile({
-  '.basic': {
-    display: 'inline-block'
-  }
-});
-
-// or give it some options
-const options = {
-    id: 'my-magical-component',
-    sourceMap: false
-};
-
-const styles = jile({
-  '.basic': {
-    display: 'inline-block'
-  }
-}, options);
-```
 
 #### Options
 
