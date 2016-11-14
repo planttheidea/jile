@@ -60,9 +60,7 @@ CSS Modules solve the main problem that CSS has ... global everything. A lot of 
 
 This is the objective of `jile`, to combine the flexibility and power of CSS with the implementation simplicity of JS. It leverages a (hopefully) familiar syntax to make transitioning from styles to `jile`s quick and painless.
 
-#### Examples
-
-**Basic usage**
+#### Basic usage
 
 The keys you provide to your objects are the selectors that will be used, and you can get as wild with your selectors as you would like ... `#unique-container button > .crazy-stuff + i` will totally be respected.
 
@@ -86,7 +84,7 @@ const styles = jile({
 }, options);
 ```
 
-**Options**
+#### Options
 
 The following values can be passed in the `options` object as the second parameter to `jile`:
 
@@ -109,7 +107,7 @@ The following values can be passed in the `options` object as the second paramet
 }
 ```
 
-**Nested children**
+#### Nested styles
 
 Use the `&` before your child declarations to inherit from the parent.
 
@@ -149,9 +147,9 @@ Creates the following output:
 }
 ```
 
-**@ declarations**
+#### Namespaced declarations
 
-You can use all forms of `@media` or `@keyframes`, even `@page`.
+You can use all forms of `@` rules ... `@media`, `@keyframes`, even `@page`.
 
 ```javascript
 const styles = jile({
@@ -237,7 +235,7 @@ Creates the following output:
 ```
 The injected `.eot` above the regular declaration is only if you provide an `.eot` in the provided object as one of the `src` values, as the injected declaration is for IE9 compat mode where as the `#iefix` declaration is for standard IE.
 
-**Global selectors**
+#### Global selectors
 
 Sometimes you want to mix your scoped styles with your global styles, and you can easily do that with the `:global()` wrapper.
 
@@ -257,7 +255,7 @@ Creates the following output:
 }
 ```
 
-**Global stylesheets**
+#### Global stylesheets
 
 You can create global stylesheets too! You get the same output, just minus the hashing.
 
@@ -283,7 +281,7 @@ Creates the following output:
 }
 ```
 
-**Prefixing**
+#### Prefixing
 
 All prefixing is handled by [inline-style-prefixer](https://github.com/rofrischmann/inline-style-prefixer) automatically, however if you want to customize the usage of the built-in prefixer, you can with the `setPrefixer` method.
 
@@ -295,7 +293,7 @@ jile.setPrefixer({
 
 If you going to customize the prefixer, it is advised you do before creating any stylesheets with it. The options passed to it are the same as the options passed to a `new Prefixer()` constructor in inline-styles-prefixer, so consult their documentation for the options available.
 
-**Managing a jile stylesheet**
+#### Managing a jile stylesheet
 
 The object that is returned when you create a `jile` has several methods for you to manage the tag if you so choose.
 
@@ -304,7 +302,7 @@ The object that is returned when you create a `jile` has several methods for you
 * `jileObject.isMounted()` will return a `boolean` value for whether the `jile` tag is currently in the DOM or not
 * `jileObject.delete()` will run `jileObject.remove()` and also delete it from the cache of object
 
-#### Local Development
+#### Development
 
 Pretty standard stuff, pull down the repo and `npm i`. There are some built-in scripts:
 * `build` = runs webpack to build dist/jile.js
