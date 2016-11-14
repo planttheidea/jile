@@ -109,3 +109,80 @@ test('if manageTagMetadataObject correctly returns a new jile', (t) => {
 
   stub.restore();
 });
+
+test.only('if add and remove will add / remove the jile instance from the DOM', (t) => {
+  const id = 'foo-bar';
+
+  const css = '.foo{display:block}';
+  const selectors = {};
+  const tag = document.createElement('style');
+
+  tag.textContent = css;
+  tag.id = id;
+
+  const options = {
+    autoMount: false,
+    hashSelectors: true,
+    id,
+    minify: false,
+    sourceMap: false
+  };
+
+  const jileObject = new Jile({
+    css,
+    selectors,
+    tag
+  }, options);
+
+  const tagBeforeAdd = document.getElementById(id);
+
+  t.is(tagBeforeAdd, null);
+
+  jileObject.add();
+
+  const tagAfteradd = document.getElementById(id);
+
+  t.not(tagAfteradd, null);
+  t.is(tagAfteradd.tagName.toLowerCase(), 'style');
+
+  jileObject.remove();
+
+  const tagAfterRemove = document.getElementById(id);
+
+  t.is(tagAfterRemove, null);
+});
+
+test.only('if isMounted will determine if the jile instance id present in the DOM', (t) => {
+  const id = 'foo-bar';
+
+  const css = '.foo{display:block}';
+  const selectors = {};
+  const tag = document.createElement('style');
+
+  tag.textContent = css;
+  tag.id = id;
+
+  const options = {
+    autoMount: false,
+    hashSelectors: true,
+    id,
+    minify: false,
+    sourceMap: false
+  };
+
+  const jileObject = new Jile({
+    css,
+    selectors,
+    tag
+  }, options);
+
+  t.false(jileObject.isMounted());
+
+  jileObject.add();
+
+  t.true(jileObject.isMounted());
+
+  jileObject.remove();
+
+  t.false(jileObject.isMounted());
+});
