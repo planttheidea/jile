@@ -104,8 +104,6 @@ const jileObject = jile(SCOPED_STYLES);
 
 const styles = jileObject.selectors;
 
-console.log(jileObject);
-
 const GLOBAL_STYLES = {
   '.container': {
     backgroundColor: 'yellow',
@@ -141,6 +139,10 @@ class App extends Component {
     );
   }
 }
+
+setTimeout(() => {
+  jileObject.remove();
+}, 3000);
 
 const div = document.createElement('div');
 

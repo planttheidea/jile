@@ -86,6 +86,29 @@ const styles = jile({
 }, options);
 ```
 
+**Options**
+
+The following values can be passed in the `options` object as the second parameter to `jile`:
+
+```javascript
+{
+    // should the tag be mounted upon creation | optional, defaults to true
+    autoMount: Boolean,
+    
+    // should the selectors be hashed | optional, defaults to true
+    hashSelectors: Boolean,
+    
+    // custom ID for the tag | optional, defaults to 'jile-stylesheet-{#}'
+    id: String, 
+    
+    // should the CSS be minified | optional, defaults to true when in production, false otherwise
+    minify: Boolean,
+    
+    // should the CSS have a sourceMap | optional, defaults to false when in production, true otherwise
+    sourceMap: Boolean
+}
+```
+
 **Nested children**
 
 Use the `&` before your child declarations to inherit from the parent.
@@ -279,7 +302,6 @@ The object that is returned when you create a `jile` has several methods for you
 * `jileObject.add()` will add the tag to the `document.head` if it is not already there
 * `jileObject.remove()` will remove the tag from the `document.head` if it is there
 * `jileObject.isMounted()` will return a `boolean` value for whether the `jile` tag is currently in the DOM or not
-* `jileObject.set(styles: Object)` will replace the styles that currently exist in the `jile` with those based on the `styles` passed
 * `jileObject.delete()` will run `jileObject.remove()` and also delete it from the cache of object
 
 #### Local Development

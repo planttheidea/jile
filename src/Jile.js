@@ -1,6 +1,3 @@
-// external dependencies
-import isFunction from 'lodash/isFunction';
-
 // utils
 import {
   OPTIONS_KEYS,
@@ -11,16 +8,6 @@ import {
 import {
   getPopulatedTag
 } from './utils/dom';
-
-// rules
-import {
-  getRules
-} from './rules';
-
-// stylesheet
-import {
-  getCssAndSelectorMap
-} from './stylesheet';
 
 let jileMap = {};
 
@@ -114,8 +101,8 @@ class Jile {
       this.remove();
     }
 
-    if (jileMap[this.id]) {
-      delete jileMap[this.id];
+    if (jileMap[this._id]) {
+      delete jileMap[this._id];
     }
   }
 
@@ -125,7 +112,7 @@ class Jile {
    * @returns {boolean}
    */
   isMounted() {
-    return !!document.getElementById(this.id);
+    return !!document.getElementById(this._id);
   }
 
   /**
@@ -134,29 +121,6 @@ class Jile {
   remove() {
     if (this.isMounted()) {
       document.head.removeChild(this.tag);
-    }
-  }
-
-  /**
-   * replace the styles currently in the tag and fire the
-   * onUpdate method if it exists
-   *
-   * @param {Object} styles
-   */
-  set(styles) {
-    const options = getOriginalOptions(this);
-    const flattenedStyles = getRules(styles, options);
-    const {
-      css: newCss,
-      selectorMap
-    } = getCssAndSelectorMap(flattenedStyles, options);
-
-    this.css = newCss;
-    this.selectors = selectorMap;
-    this.tag.textContent = newCss;
-
-    if (isFunction(this.onUpdate)) {
-      this.onUpdate(this);
     }
   }
 }

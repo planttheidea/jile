@@ -7,11 +7,11 @@
     "require": [
       "babel-register",
       "babel-polyfill",
-      "./test-new/helpers/setup-browser-env.js"
+      "./test/helpers/setup-browser-env.js"
     ],
     "files": [
-      "test-new/**/*.js",
-      "!test-new/helpers/*.js"
+      "test/**/*.js",
+      "!test/helpers/*.js"
     ],
     "verbose": true
   },
