@@ -36,7 +36,7 @@ const styles = {
   },
   '@media print': {
     '.foo': {
-      display: 'block
+      display: 'block'
     }
   }
 };
