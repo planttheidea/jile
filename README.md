@@ -29,10 +29,15 @@ For those that have used both [CSS Modules](https://github.com/css-modules/css-m
 ```javascript
 import jile from 'jile';
 
-// create your styles as a plain object, with the CSS selector as the key
+// create your styles as a plain object, with the CSS selector as the keys
 const styles = {
   '.foo': {
     display: 'inline-block'
+  },
+  '@media print': {
+    '.foo': {
+      display: 'block
+    }
   }
 };
 
