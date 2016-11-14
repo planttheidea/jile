@@ -48,15 +48,15 @@ Any styles that you declare in the object passed to the `jile` function are pars
 
 #### Why
 
-**...not inline styles?**
+*...not inline styles?*
 
 Inline styles have become popular again for a reason ... everything is in JavaScript so it is dynamic, specificity is not a concern, and prefixing is handled easily, without the need for proprietary method calls (Compass, for example). That said, inline styles can only provide a limited subset of CSS ... `@media` queries, `@keyframes`, psuedo-selectors, etc. are all unable to be done with pure inline styles. Libraries like [Radium](https://github.com/FormidableLabs/radium) help with some of these aspects, but it still is incomplete.
 
-**...not CSS Modules?**
+*...not CSS Modules?*
 
 CSS Modules solve the main problem that CSS has ... global everything. A lot of `jile` concepts are taken from CSS Modules, because you can leverage the full power of CSS while still scoping things to your component. That said, CSS adds another piece to your build process (more dependencies), and now requires consumers of your component to include a second reference (one for your JS, one for your CSS).
 
-**... not both?**
+*... not both?*
 
 This is the objective of `jile`, to combine the flexibility and power of CSS with the implementation simplicity of JS. It leverages a (hopefully) familiar syntax to make transitioning from styles to `jile`s quick and painless.
 
