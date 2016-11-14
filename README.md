@@ -293,7 +293,7 @@ jile.setPrefixer({
 
 If you going to customize the prefixer, it is advised you do before creating any stylesheets with it. The options passed to it are the same as the options passed to a `new Prefixer()` constructor in inline-styles-prefixer, so consult their documentation for the options available.
 
-#### Managing a jile stylesheet
+#### Managing a jile sheet
 
 The object that is returned when you create a `jile` has several methods for you to manage the tag if you so choose.
 
