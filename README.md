@@ -29,17 +29,27 @@ For those that have used both [CSS Modules](https://github.com/css-modules/css-m
 ```javascript
 import jile from 'jile';
 
-const jileObject = jile({
+// create your styles as a plain object, with the CSS selector as the key
+const styles = {
   '.foo': {
     display: 'inline-block'
   }
-});
+};
 
-const styles = jileObject.selectors;
+// optionally provide object of options for the generation of the jile
+const options = {
+  id: 'my-custom-id'
+};
+
+// the jile instance returned will have metadata, such as the css, selectors, and the tag injected 
+const j = jile(styles, options);
+
+// usually you just want the selectors so you can use them in your view
+const selectors = j.selectors;
 
 const ExampleComponent = () => {
   return (
-    <div className={styles.foo}>
+    <div className={selectors.foo}>
       I have a scoped class Selector!
     </div>
   );
