@@ -35,8 +35,8 @@ const styles = {
     display: 'inline-block'
   },
   '@media print': {
-    '.foo': {
-      display: 'block'
+    '.bar': {
+      display: 'none'
     }
   }
 };
