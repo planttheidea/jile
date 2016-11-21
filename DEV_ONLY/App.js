@@ -116,6 +116,17 @@ jile(GLOBAL_STYLES, {
   id: 'universal-styles'
 });
 
+// jile({
+//   ...GLOBAL_STYLES,
+//   '.container': {
+//     backgroundColor: 'lightblue',
+//     height: '200vh'
+//   }
+// }, {
+//   hashSelectors: false,
+//   id: 'universal-styles'
+// });
+
 class App extends Component {
   render() {
     return (
@@ -140,9 +151,9 @@ class App extends Component {
   }
 }
 
-setTimeout(() => {
-  jileObject.remove();
-}, 3000);
+// setTimeout(() => {
+//   jileObject.remove();
+// }, 3000);
 
 const div = document.createElement('div');
 

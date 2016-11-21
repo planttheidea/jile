@@ -12,6 +12,18 @@ import {
   assign
 } from './constants';
 
+let idCounter = 0;
+
+/**
+ * return the id passed or a generated one based on counter
+ *
+ * @param {string} id
+ * @returns {string}
+ */
+const getGeneratedJileId = (id) => {
+  return !isUndefined(id) ? id : `jile-stylesheet-${idCounter++}`;
+};
+
 /**
  * coalesce the options with default options and the generated id
  *
@@ -24,18 +36,6 @@ const getCleanOptions = (options = {}) => {
     ...options,
     id: getGeneratedJileId(options.id)
   };
-};
-
-let idCounter = 0;
-
-/**
- * return the id passed or a generated one based on counter
- *
- * @param {string} id
- * @returns {string}
- */
-const getGeneratedJileId = (id) => {
-  return !isUndefined(id) ? id : `jile-stylesheet-${idCounter++}`;
 };
 
 /**

@@ -139,11 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// utils
 	// polyfills
 	jile.setPrefixerOptions = function () {
-	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-	    args[_key] = arguments[_key];
-	  }
-	
-	  return _prefix.setPrefixerOptions.apply(undefined, args);
+	  return _prefix.setPrefixerOptions.apply(undefined, arguments);
 	};
 	
 	exports.default = jile;
@@ -561,6 +557,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
+	var idCounter = 0;
+	
+	/**
+	 * return the id passed or a generated one based on counter
+	 *
+	 * @param {string} id
+	 * @returns {string}
+	 */
+	var getGeneratedJileId = function getGeneratedJileId(id) {
+	  return !(0, _isUndefined2.default)(id) ? id : 'jile-stylesheet-' + idCounter++;
+	};
+	
 	/**
 	 * coalesce the options with default options and the generated id
 	 *
@@ -573,18 +581,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return _extends({}, _constants.DEFAULT_OPTIONS, options, {
 	    id: getGeneratedJileId(options.id)
 	  });
-	};
-	
-	var idCounter = 0;
-	
-	/**
-	 * return the id passed or a generated one based on counter
-	 *
-	 * @param {string} id
-	 * @returns {string}
-	 */
-	var getGeneratedJileId = function getGeneratedJileId(id) {
-	  return !(0, _isUndefined2.default)(id) ? id : 'jile-stylesheet-' + idCounter++;
 	};
 	
 	/**
@@ -881,38 +877,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {});
 	};
 	
-	/**
-	 * create or update the jile tag and return the metadata object
-	 *
-	 * @param {string} css
-	 * @param {Object} selectors
-	 * @param {Object} options
-	 * @param {string} options.id
-	 * @returns {Object}
-	 */
-	var manageTagMetadataObject = function manageTagMetadataObject(css, selectors, options) {
-	  var id = options.id;
-	
-	
-	  var cachedJile = jileMap[id];
-	
-	  if (cachedJile) {
-	    cachedJile.css = css;
-	    cachedJile.tag.textContent = css;
-	
-	    return cachedJile;
-	  }
-	
-	  var tag = (0, _dom.getPopulatedTag)(css, id, options);
-	  var jileProperties = {
-	    css: css,
-	    selectors: selectors,
-	    tag: tag
-	  };
-	
-	  return new Jile(jileProperties, options);
-	};
-	
 	var Jile = function () {
 	  function Jile(_ref, options) {
 	    var _this = this;
@@ -994,6 +958,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Jile;
 	}();
 	
+	/**
+	 * create or update the jile tag and return the metadata object
+	 *
+	 * @param {string} css
+	 * @param {Object} selectors
+	 * @param {Object} options
+	 * @param {string} options.id
+	 * @returns {Object}
+	 */
+	
+	
+	var manageTagMetadataObject = function manageTagMetadataObject(css, selectors, options) {
+	  var id = options.id;
+	
+	
+	  var cachedJile = jileMap[id];
+	  var tag = (0, _dom.getPopulatedTag)(css, id, options);
+	
+	  if (cachedJile) {
+	    cachedJile.css = css;
+	    cachedJile.tag.textContent = css;
+	
+	    return cachedJile;
+	  }
+	
+	  var jileProperties = {
+	    css: css,
+	    selectors: selectors,
+	    tag: tag
+	  };
+	
+	  return new Jile(jileProperties, options);
+	};
+	
 	exports.Jile = Jile;
 	exports.getInternalOptionKey = getInternalOptionKey;
 	exports.getOriginalOptions = getOriginalOptions;
@@ -1001,13 +999,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 15 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.getPopulatedTag = undefined;
+	
+	var _constants = __webpack_require__(11);
+	
 	/**
 	 * get the new tag with the textContent set to the css string passed
 	 *
@@ -1023,12 +1025,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return null;
 	  }
 	
+	  var existingTag = document.getElementById(id);
+	
+	  if (existingTag && !_constants.IS_PRODUCTION) {
+	    /* eslint-disable no-console */
+	    console.warn('The tag for ID "' + id + '" already exists, so it will be updated in place.');
+	    /* eslint-enable */
+	  }
+	
 	  if (sourceMap) {
 	    var blob = new window.Blob([css], {
 	      type: 'text/css'
 	    });
 	
-	    var link = document.createElement('link');
+	    var link = existingTag || document.createElement('link');
 	
 	    link.rel = 'stylesheet';
 	    link.id = id;
@@ -1037,7 +1047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return link;
 	  }
 	
-	  var style = document.createElement('style');
+	  var style = existingTag || document.createElement('style');
 	
 	  // old webkit hack
 	  style.appendChild(document.createTextNode(''));
@@ -1046,8 +1056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  style.textContent = css;
 	
 	  return style;
-	};
-	
+	}; // constants
 	exports.getPopulatedTag = getPopulatedTag;
 
 /***/ },
@@ -1277,7 +1286,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    root: ''
 	  };
 	
+	  /* eslint-disable no-use-before-define */
 	  return getFlattenedRules(styles, newOptions);
+	  /* eslint-enable */
 	};
 	
 	/**
@@ -1356,11 +1367,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return (0, _constants.getOwnPropertyNames)(child).reduce(function (rulesAcc, childKey) {
 	    if ((0, _isPlainObject2.default)(child[childKey])) {
 	      var _fullKey = getFullKey(root, key);
+	
+	      /* eslint-disable no-use-before-define */
 	      var childRules = getFlattenedRules(child, {
 	        hashSelectors: hashSelectors,
 	        id: id,
 	        root: _fullKey
 	      });
+	      /* eslint-enable */
 	
 	      return (0, _merge6.default)(rulesAcc, childRules);
 	    }
