@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "blob-polyfill": "^1.0.20150320",
-    "eslint-config-rapid7": "^2.6.0",
     "hash-it": "^2.0.1",
     "inline-style-prefixer": ">=2.0.0",
     "lodash": "^4.16.6"
@@ -37,6 +36,7 @@
     "babel-preset-react": "6.16.0",
     "babel-preset-stage-2": "6.18.0",
     "eslint": "^3.10.2",
+    "eslint-config-rapid7": "^2.6.0",
     "eslint-friendly-formatter": "2.0.6",
     "eslint-loader": "1.6.1",
     "html-webpack-plugin": "2.24.1",
