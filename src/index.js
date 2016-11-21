@@ -64,7 +64,7 @@ const jile = (styles = {}, passedOptions = {}) => {
  * @returns {*}
  */
 jile.setPrefixerOptions = (...args) => {
-  return setPrefixerOptions.apply(undefined, args);
+  return setPrefixerOptions(...args);
 };
 
 export default jile;

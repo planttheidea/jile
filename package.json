@@ -20,32 +20,31 @@
   },
   "dependencies": {
     "blob-polyfill": "^1.0.20150320",
+    "eslint-config-rapid7": "^2.6.0",
     "hash-it": "^2.0.1",
     "inline-style-prefixer": ">=2.0.0",
     "lodash": "^4.16.6"
   },
   "description": "Styling library using the full power of both CSS and JS",
   "devDependencies": {
-    "ava": "0.16.0",
+    "ava": "^0.17.0",
     "babel": "6.5.2",
     "babel-cli": "6.18.0",
-    "babel-eslint": "7.1.0",
-    "babel-loader": "6.2.7",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.2.8",
     "babel-plugin-add-module-exports": "0.2.1",
     "babel-preset-latest": "6.16.0",
     "babel-preset-react": "6.16.0",
     "babel-preset-stage-2": "6.18.0",
-    "eslint": "3.10.0",
+    "eslint": "^3.10.2",
     "eslint-friendly-formatter": "2.0.6",
     "eslint-loader": "1.6.1",
-    "eslint-plugin-babel": "3.3.0",
-    "eslint-plugin-react": "6.6.0",
     "html-webpack-plugin": "2.24.1",
     "in-publish": "2.0.0",
     "jsdom": "9.8.3",
     "jsdom-global": "^2.1.0",
     "lodash-webpack-plugin": "^0.10.5",
-    "nyc": "^8.4.0",
+    "nyc": "^9.0.1",
     "optimize-js-plugin": "0.0.4",
     "performance-now": "0.2.0",
     "react": ">=15.0.0",
@@ -77,6 +76,7 @@
     "build": "NODE_ENV=development webpack --progress",
     "build:minified": "NODE_ENV=production webpack --progress --config=webpack.config.minified.js",
     "lint": "NODE_ENV=test eslint src",
+    "lint:fix": "NODE_ENV=test eslint src --fix",
     "prepublish": "in-publish && npm run prepublish:compile || in-install",
     "prepublish:compile": "npm run lint && npm run test && npm run transpile && npm run build && npm run build:minified",
     "start": "NODE_ENV=development webpack-dashboard -- webpack-dev-server --config=webpack.config.dev.js",
@@ -85,5 +85,5 @@
     "test:watch": "NODE_PATH=. NODE_ENV=test ava --watch",
     "transpile": "NODE_ENV=production babel src --out-dir lib"
   },
-  "version": "2.0.0"
+  "version": "2.0.1"
 }

@@ -96,7 +96,7 @@ const getVendorPrefix = (property) => {
  * @returns {boolean}
  */
 const shouldApplyPxSuffix = (property, value) => {
-  return isNumber(value) && value !== 0 &&  !isUnitlessProperty(property);
+  return isNumber(value) && value !== 0 && !isUnitlessProperty(property);
 };
 
 /**
