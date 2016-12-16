@@ -35,39 +35,6 @@ const getOriginalOptions = (jileObject) => {
   }, {});
 };
 
-/**
- * create or update the jile tag and return the metadata object
- *
- * @param {string} css
- * @param {Object} selectors
- * @param {Object} options
- * @param {string} options.id
- * @returns {Object}
- */
-const manageTagMetadataObject = (css, selectors, options) => {
-  const {
-    id
-  } = options;
-
-  const cachedJile = jileMap[id];
-
-  if (cachedJile) {
-    cachedJile.css = css;
-    cachedJile.tag.textContent = css;
-
-    return cachedJile;
-  }
-
-  const tag = getPopulatedTag(css, id, options);
-  const jileProperties = {
-    css,
-    selectors,
-    tag
-  };
-
-  return new Jile(jileProperties, options);
-};
-
 class Jile {
   constructor({css, selectors, tag}, options) {
     keys(options).forEach((option) => {
@@ -124,6 +91,39 @@ class Jile {
     }
   }
 }
+
+/**
+ * create or update the jile tag and return the metadata object
+ *
+ * @param {string} css
+ * @param {Object} selectors
+ * @param {Object} options
+ * @param {string} options.id
+ * @returns {Object}
+ */
+const manageTagMetadataObject = (css, selectors, options) => {
+  const {
+    id
+  } = options;
+
+  const cachedJile = jileMap[id];
+  const tag = getPopulatedTag(css, id, options);
+
+  if (cachedJile) {
+    cachedJile.css = css;
+    cachedJile.tag.textContent = css;
+
+    return cachedJile;
+  }
+
+  const jileProperties = {
+    css,
+    selectors,
+    tag
+  };
+
+  return new Jile(jileProperties, options);
+};
 
 export {Jile};
 export {getInternalOptionKey};

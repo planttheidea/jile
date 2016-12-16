@@ -187,7 +187,9 @@ const getMediaQueryRules = (value, {hashSelectors, id, root = ''}) => {
     root: ''
   };
 
+  /* eslint-disable no-use-before-define */
   return getFlattenedRules(styles, newOptions);
+  /* eslint-enable */
 };
 
 /**
@@ -264,11 +266,14 @@ const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
   return getOwnPropertyNames(child).reduce((rulesAcc, childKey) => {
     if (isPlainObject(child[childKey])) {
       const fullKey = getFullKey(root, key);
+
+      /* eslint-disable no-use-before-define */
       const childRules = getFlattenedRules(child, {
         hashSelectors,
         id,
         root: fullKey
       });
+      /* eslint-enable */
 
       return merge(rulesAcc, childRules);
     }
