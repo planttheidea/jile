@@ -1,14 +1,8 @@
 {
-  "extends": "rapid7/browser",
+  "extends": ["rapid7/browser"],
   "globals": {
     "process": true
   },
   "parser": "babel-eslint",
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "module"
-  },
-  "rules":{
-    "react/no-is-mounted": 0
-  }
+  "rules": {}
 }

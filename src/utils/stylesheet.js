@@ -1,28 +1,23 @@
-// external dependencies
-import isNumber from 'lodash/isNumber';
-import isString from 'lodash/isString';
-
 // constants {
 import {
   IS_PRODUCTION,
   KEYFRAMES_FOLLOWED_BY_NAME_REGEXP,
   MEDIA_QUERY_REGEXP,
-
-  assign,
-  getOwnPropertyNames,
-  keys
-} from './constants';
+} from '../constants';
 
 // is
 import {
+  assign,
   getHashedSelector,
   getHashedValue,
-  toKebabCase
+  toKebabCase,
 } from './general';
 import {
   isType,
-  isUnitlessProperty
+  isUnitlessProperty,
 } from './is';
+
+const {getOwnPropertyNames, keys} = Object;
 
 /**
  * return the appropriate number of spaces,
@@ -74,9 +69,8 @@ const getNewline = (newlines = 1) => {
  */
 const getVendorPrefix = (property) => {
   const prefixedProperty = toKebabCase(property);
-  const vendorPrefix = prefixedProperty.split('-')[0];
 
-  switch (vendorPrefix) {
+  switch (prefixedProperty.split('-')[0]) {
     case 'moz':
     case 'ms':
     case 'o':
@@ -95,9 +89,8 @@ const getVendorPrefix = (property) => {
  * @param {*} value
  * @returns {boolean}
  */
-const shouldApplyPxSuffix = (property, value) => {
-  return isNumber(value) && value !== 0 && !isUnitlessProperty(property);
-};
+const shouldApplyPxSuffix = (property, value) =>
+  typeof value === 'number' && value !== 0 && !isUnitlessProperty(property);
 
 /**
  * build the property values, adding 'px' if it
@@ -109,14 +102,12 @@ const shouldApplyPxSuffix = (property, value) => {
  * @returns {string}
  */
 const buildPropertyValues = (property, rule, indent = 2) => {
-  const prefixedProperty = getVendorPrefix(property);
   const originalValue = rule[property];
+
   const realValue = shouldApplyPxSuffix(property, originalValue) ? `${originalValue}px` : originalValue;
+  const ruleString = `${getVendorPrefix(property)}: ${realValue};`;
 
-  const leadingWhitespace = `${getNewline()}${getIndent(indent)}`;
-  const ruleString = `${prefixedProperty}: ${realValue};`;
-
-  return `${leadingWhitespace}${ruleString}`;
+  return `${getNewline()}${getIndent(indent)}${ruleString}`;
 };
 
 /**
@@ -167,12 +158,10 @@ const sortKeyframesKeys = (previousValue, currentValue) => {
   return previousNumericValue > currentNumericValue;
 };
 
-const getUnhashedSelectorObject = (selector) => {
-  return {
-    selector,
-    selectorMap: {}
-  };
-};
+const getUnhashedSelectorObject = (selector) => ({
+  selector,
+  selectorMap: {},
+});
 
 /**
  * build the text for the block of styles
@@ -185,10 +174,7 @@ const getUnhashedSelectorObject = (selector) => {
  * @returns {string}
  */
 const getKeyframesBlock = (selector, rule, options, selectorMap) => {
-  const {
-    hashSelectors,
-    id
-  } = options;
+  const {hashSelectors, id} = options;
   const hashedSelector = hashSelectors ? getHashedKeyframesName(selector, id, selectorMap) : selector;
 
   let textContent = getNewline();
@@ -230,30 +216,28 @@ const getKeyframesBlock = (selector, rule, options, selectorMap) => {
  * @returns {string}
  */
 const getMediaQueryBlockAndSelectorMap = (selector, rule, options, indent = 0) => {
-  const {
-    hashSelectors,
-    id
-  } = options;
+  const {hashSelectors, id} = options;
 
-  let css = getNewline() + getIndent(indent) + `${selector} {`,
+  let css = `${getNewline() + getIndent(indent)}${selector} {`,
       selectorMap = {};
 
   getOwnPropertyNames(rule).forEach((subSelector) => {
     if (isType(MEDIA_QUERY_REGEXP, subSelector)) {
-      const {
-        css: subSelectorCss,
-        selectorMap: subSelectorMap
-      } = getMediaQueryBlockAndSelectorMap(subSelector, rule[subSelector], options, indent + 2);
+      const {css: subSelectorCss, selectorMap: subSelectorMap} = getMediaQueryBlockAndSelectorMap(
+        subSelector,
+        rule[subSelector],
+        options,
+        indent + 2
+      );
 
       assign(selectorMap, subSelectorMap);
 
       css += subSelectorCss;
     } else {
       const subSelectorBlock = rule[subSelector];
-      const {
-        selector: hashedSelector,
-        selectorMap: hashedSelectorMap
-      } = hashSelectors ? getHashedSelector(subSelector, id) : getUnhashedSelectorObject(subSelector);
+      const {selector: hashedSelector, selectorMap: hashedSelectorMap} = hashSelectors
+        ? getHashedSelector(subSelector, id)
+        : getUnhashedSelectorObject(subSelector);
 
       assign(selectorMap, hashedSelectorMap);
 
@@ -264,15 +248,15 @@ const getMediaQueryBlockAndSelectorMap = (selector, rule, options, indent = 0) =
         css += buildPropertyValues(property, subSelectorBlock, indent + 4);
       });
 
-      css += getNewline() + getIndent(indent + 2) + '}';
+      css += `${getNewline() + getIndent(indent + 2)}}`;
     }
   });
 
-  css += getNewline() + getIndent(indent) + '}';
+  css += `${getNewline() + getIndent(indent)}}`;
 
   return {
     css,
-    selectorMap
+    selectorMap,
   };
 };
 
@@ -283,11 +267,12 @@ const getMediaQueryBlockAndSelectorMap = (selector, rule, options, indent = 0) =
  * @returns {string}
  */
 const minify = (css) => {
-  if (!isString(css)) {
+  if (typeof css !== 'string') {
     throw new TypeError('CSS passed must be a string value.');
   }
 
-  return css.trim()
+  return css
+    .trim()
     .replace(/\/\*[\s\S]+?\*\//g, '')
     .replace(/[\n\r]/g, '')
     .replace(/\s*([:;,{}])\s*/g, '$1')
@@ -312,15 +297,11 @@ const minify = (css) => {
  * @returns {string}
  */
 const getStandardBlockAndSelectorMap = (selector, rule, options, isSelectorFontFace) => {
-  const {
-    hashSelectors,
-    id
-  } = options;
+  const {hashSelectors, id} = options;
 
-  const {
-    selector: hashedSelector,
-    selectorMap: hashedSelectorMap
-  } = hashSelectors ? getHashedSelector(selector, id) : getUnhashedSelectorObject(selector);
+  const {selector: hashedSelector, selectorMap: hashedSelectorMap} = hashSelectors
+    ? getHashedSelector(selector, id)
+    : getUnhashedSelectorObject(selector);
 
   let css = getNewline(),
       selectorMap = {};
@@ -336,7 +317,7 @@ const getStandardBlockAndSelectorMap = (selector, rule, options, isSelectorFontF
       if (matches && matches[1]) {
         const fileName = matches[1].replace(/['"]/, '');
 
-        css += getNewline() + getIndent(2) + `src: url('${fileName}.eot');`;
+        css += `${getNewline() + getIndent(2)}src: url('${fileName}.eot');`;
       }
     }
 
@@ -348,7 +329,7 @@ const getStandardBlockAndSelectorMap = (selector, rule, options, isSelectorFontF
 
   return {
     css,
-    selectorMap
+    selectorMap,
   };
 };
 

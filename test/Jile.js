@@ -5,7 +5,7 @@ import {
   Jile,
   getInternalOptionKey,
   getOriginalOptions,
-  manageTagMetadataObject
+  manageTagMetadataObject,
 } from 'src/Jile';
 
 import * as domUtils from 'src/utils/dom';
@@ -13,27 +13,30 @@ import * as domUtils from 'src/utils/dom';
 test('if Jile returns a valid Jile instance based on the values passed', (t) => {
   const css = '.foo {display: block}';
   const selectors = {
-    foo: 'bar'
+    foo: 'bar',
   };
   const tag = document.createElement('style');
 
   const mainObject = {
     css,
     selectors,
-    tag
+    tag,
   };
   const options = {
     autoMount: false,
     hashSelectors: true,
     id: 'foo',
     minify: false,
-    sourceMap: true
+    sourceMap: true,
   };
 
   const result = new Jile(mainObject, options);
 
+  // is the result a jile
+  t.true(result instanceof Jile);
+
   // do the values surfaced match those passed
-  t.deepEqual(result, mainObject);
+  t.deepEqual({...result}, mainObject);
 
   // and are the options passed stored frozen
   Object.getOwnPropertyNames(result).forEach((key) => {
@@ -57,16 +60,16 @@ test('if getInternalOptionKey returns the key with a prefixing underscore', (t) 
 
 test('if getOriginalOptions returns an object that only contains keys from the options object', (t) => {
   const object = {
-    _foo: 'bar',
     _autoMount: true,
     _bar: 'baz',
-    _hashSelectors: false,
-    _baz: 'foo',
-    _minify: true,
-    _fooBar: 'asdf',
-    _sourceMap: true,
     _barBaz: 'qwer',
-    _id: 'foo-bar'
+    _baz: 'foo',
+    _foo: 'bar',
+    _fooBar: 'asdf',
+    _hashSelectors: false,
+    _id: 'foo-bar',
+    _minify: true,
+    _sourceMap: true,
   };
 
   const result = getOriginalOptions(object);
@@ -76,41 +79,43 @@ test('if getOriginalOptions returns an object that only contains keys from the o
     hashSelectors: false,
     id: 'foo-bar',
     minify: true,
-    sourceMap: true
+    sourceMap: true,
   });
 });
 
 test('if manageTagMetadataObject correctly returns a new jile', (t) => {
   const css = '.foo {display: block}';
   const selectors = {
-    foo: 'bar'
+    foo: 'bar',
   };
   const options = {
     autoMount: false,
     hashSelectors: true,
     id: 'foo',
     minify: false,
-    sourceMap: true
+    sourceMap: true,
   };
 
   const tag = document.createElement('style');
 
-  const stub = sinon.stub(domUtils, 'getPopulatedTag', () => {
-    return tag;
-  });
+  const stub = sinon.stub(domUtils, 'getPopulatedTag').callsFake(() => tag);
 
   const result = manageTagMetadataObject(css, selectors, options);
 
-  t.deepEqual(result, {
-    css,
-    selectors,
-    tag
-  });
+  t.true(result instanceof Jile);
+  t.deepEqual(
+    {...result},
+    {
+      css,
+      selectors,
+      tag,
+    }
+  );
 
   stub.restore();
 });
 
-test.only('if add and remove will add / remove the jile instance from the DOM', (t) => {
+test('if add and remove will add / remove the jile instance from the DOM', (t) => {
   const id = 'foo-bar';
 
   const css = '.foo{display:block}';
@@ -125,14 +130,17 @@ test.only('if add and remove will add / remove the jile instance from the DOM', 
     hashSelectors: true,
     id,
     minify: false,
-    sourceMap: false
+    sourceMap: false,
   };
 
-  const jileObject = new Jile({
-    css,
-    selectors,
-    tag
-  }, options);
+  const jileObject = new Jile(
+    {
+      css,
+      selectors,
+      tag,
+    },
+    options
+  );
 
   const tagBeforeAdd = document.getElementById(id);
 
@@ -152,7 +160,7 @@ test.only('if add and remove will add / remove the jile instance from the DOM', 
   t.is(tagAfterRemove, null);
 });
 
-test.only('if isMounted will determine if the jile instance id present in the DOM', (t) => {
+test('if isMounted will determine if the jile instance id present in the DOM', (t) => {
   const id = 'foo-bar';
 
   const css = '.foo{display:block}';
@@ -167,14 +175,17 @@ test.only('if isMounted will determine if the jile instance id present in the DO
     hashSelectors: true,
     id,
     minify: false,
-    sourceMap: false
+    sourceMap: false,
   };
 
-  const jileObject = new Jile({
-    css,
-    selectors,
-    tag
-  }, options);
+  const jileObject = new Jile(
+    {
+      css,
+      selectors,
+      tag,
+    },
+    options
+  );
 
   t.false(jileObject.isMounted());
 

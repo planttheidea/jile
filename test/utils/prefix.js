@@ -3,7 +3,7 @@ import test from 'ava';
 import {
   getKeyframesPrefix,
   prefix,
-  setPrefixerOptions
+  setPrefixerOptions,
 } from 'src/utils/prefix';
 
 test('if getKeyframesPrefix returns valid prefix', (t) => {
@@ -17,23 +17,23 @@ test('if getKeyframesPrefix returns valid prefix', (t) => {
 
 test.serial('if prefix will prefix the styles passed to it', (t) => {
   setPrefixerOptions({
-    userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36'
+    userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36',
   });
 
   const result = prefix({
-    appearance: 'none'
+    appearance: 'none',
   });
 
   t.deepEqual(result, {
-    WebkitAppearance: 'none'
+    WebkitAppearance: 'none',
   });
 
   setPrefixerOptions({});
 });
 
-test.serial('if setPrefixerOptions sets userAgent and prefix provides prefixed values correctly',  (t) => {
+test.serial('if setPrefixerOptions sets userAgent and prefix provides prefixed values correctly', (t) => {
   setPrefixerOptions({
-    userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36'
+    userAgent: 'Mozilla/5.0 (X11; NetBSD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.116 Safari/537.36',
   });
 
   const webkitKeyframesPrefix = getKeyframesPrefix();
@@ -41,14 +41,14 @@ test.serial('if setPrefixerOptions sets userAgent and prefix provides prefixed v
   t.is(webkitKeyframesPrefix, '-webkit-keyframes');
 
   setPrefixerOptions({
-    userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.28) Gecko/20120306 Firefox/5.0.1'
+    userAgent: 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.28) Gecko/20120306 Firefox/5.0.1',
   });
 
   const mozAppearance = prefix({
-    appearance: 'none'
+    appearance: 'none',
   });
 
   t.deepEqual(mozAppearance, {
-    MozAppearance: 'none'
+    MozAppearance: 'none',
   });
 });

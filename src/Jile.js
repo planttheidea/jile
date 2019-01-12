@@ -1,13 +1,9 @@
 // utils
-import {
-  OPTIONS_KEYS,
+import {OPTIONS_KEYS} from './constants';
+import {getPopulatedTag} from './utils/dom';
+import {assign} from './utils/general';
 
-  assign,
-  keys
-} from './utils/constants';
-import {
-  getPopulatedTag
-} from './utils/dom';
+const {defineProperty, keys} = Object;
 
 let jileMap = {};
 
@@ -17,9 +13,7 @@ let jileMap = {};
  * @param {string} key
  * @returns {string}
  */
-const getInternalOptionKey = (key) => {
-  return `_${key}`;
-};
+export const getInternalOptionKey = (key) => `_${key}`;
 
 /**
  * get the original options passed
@@ -27,22 +21,17 @@ const getInternalOptionKey = (key) => {
  * @param {Jile} jileObject
  * @returns {Object}
  */
-const getOriginalOptions = (jileObject) => {  
-  return OPTIONS_KEYS.reduce((options, key) => {
-    return assign(options, {
-      [key]: jileObject[getInternalOptionKey(key)]
-    });
-  }, {});
-};
+export const getOriginalOptions = (jileObject) =>
+  OPTIONS_KEYS.reduce((options, key) => assign(options, {[key]: jileObject[getInternalOptionKey(key)]}), {});
 
-class Jile {
+export class Jile {
   constructor({css, selectors, tag}, options) {
     keys(options).forEach((option) => {
-      Object.defineProperty(this, getInternalOptionKey(option), {
+      defineProperty(this, getInternalOptionKey(option), {
         configurable: false,
         enumerable: false,
         value: options[option],
-        writable: false
+        writable: false,
       });
     });
 
@@ -101,13 +90,10 @@ class Jile {
  * @param {string} options.id
  * @returns {Object}
  */
-const manageTagMetadataObject = (css, selectors, options) => {
-  const {
-    id
-  } = options;
+export const manageTagMetadataObject = (css, selectors, options) => {
+  const {id} = options;
 
   const cachedJile = jileMap[id];
-  const tag = getPopulatedTag(css, id, options);
 
   if (cachedJile) {
     cachedJile.css = css;
@@ -116,16 +102,14 @@ const manageTagMetadataObject = (css, selectors, options) => {
     return cachedJile;
   }
 
-  const jileProperties = {
-    css,
-    selectors,
-    tag
-  };
+  const tag = getPopulatedTag(css, id, options);
 
-  return new Jile(jileProperties, options);
+  return new Jile(
+    {
+      css,
+      selectors,
+      tag,
+    },
+    options
+  );
 };
-
-export {Jile};
-export {getInternalOptionKey};
-export {getOriginalOptions};
-export {manageTagMetadataObject};
