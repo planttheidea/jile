@@ -1,11 +1,12 @@
 {
-  "plugins": [
-    "add-module-exports"
-  ],
+  "plugins": ["add-module-exports"],
   "presets": [
-    ["latest", {
-      "loose": true
-    }],
+    [
+      "env",
+      {
+        "loose": true
+      }
+    ],
     "stage-2",
     "react"
   ]

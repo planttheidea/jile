@@ -12,7 +12,7 @@ import {
   getVendorPrefix,
   minify,
   shouldApplyPxSuffix,
-  sortKeyframesKeys
+  sortKeyframesKeys,
 } from 'src/utils/stylesheet';
 
 import * as generalUtils from 'src/utils/general';
@@ -20,18 +20,16 @@ import * as generalUtils from 'src/utils/general';
 test('if buildPropertyValues creates css text correctly', (t) => {
   const property = 'foo';
   const rule = {
-    foo: 'bar'
+    foo: 'bar',
   };
 
   const result = buildPropertyValues(property, rule);
 
-  t.is(result, `\n  ${property}: ${rule[property]};`)
+  t.is(result, `\n  ${property}: ${rule[property]};`);
 });
 
 test('if getHashedKeyframesName will hash the keyframes name correctly', (t) => {
-  const stub = sinon.stub(generalUtils, 'getHashedValue', (value, id) => {
-    return `${value}-${id}`;
-  });
+  const stub = sinon.stub(generalUtils, 'getHashedValue').callsFake((value, id) => `${value}-${id}`);
 
   const selector = '@keyframes bar';
   const id = 'foo';
@@ -62,21 +60,23 @@ test('if getKeyframesBlock produces the correct css string', (t) => {
   const selector = '@keyframes foo';
   const rule = {
     from: {
-      color: 'red'
+      color: 'red',
     },
     to: {
-      color: 'blue'
-    }
+      color: 'blue',
+    },
   };
   const options = {
     hashSelectors: false,
-    id: 'bar'
+    id: 'bar',
   };
   const selectorMap = {};
 
   const result = getKeyframesBlock(selector, rule, options, selectorMap);
 
-  t.is(result, `
+  t.is(
+    result,
+    `
 @keyframes foo {
   from {
     color: red;
@@ -84,32 +84,33 @@ test('if getKeyframesBlock produces the correct css string', (t) => {
   to {
     color: blue;
   }
-}`);
+}`
+  );
 });
 
 test('if getMediaQueryBlockAndSelectorMap produces the correct css string when hashSelectors is false', (t) => {
   const selector = '@media print';
   const rule = {
     '.foo': {
-      display: 'none'
-    }
+      display: 'none',
+    },
   };
   const options = {
     hashSelectors: false,
-    id: 'bar'
+    id: 'bar',
   };
 
-  const {
-    css,
-    selectorMap
-  } = getMediaQueryBlockAndSelectorMap(selector, rule, options);
+  const {css, selectorMap} = getMediaQueryBlockAndSelectorMap(selector, rule, options);
 
-  t.is(css, `
+  t.is(
+    css,
+    `
 @media print {
   .foo {
     display: none;
   }
-}`);
+}`
+  );
   t.deepEqual(selectorMap, {});
 });
 
@@ -117,26 +118,26 @@ test('if getMediaQueryBlockAndSelectorMap produces the correct css string when h
   const selector = '@media print';
   const rule = {
     '.foo': {
-      display: 'none'
-    }
+      display: 'none',
+    },
   };
   const options = {
     hashSelectors: true,
-    id: 'bar'
+    id: 'bar',
   };
 
-  const {
-    css,
-    selectorMap
-  } = getMediaQueryBlockAndSelectorMap(selector, rule, options);
+  const {css, selectorMap} = getMediaQueryBlockAndSelectorMap(selector, rule, options);
 
-  t.is(css, `
+  t.is(
+    css,
+    `
 @media print {
-  .jile__foo__3126029035 {
+  .jile__foo__6289739852701 {
     display: none;
   }
-}`);
-  t.deepEqual(selectorMap, {foo: 'jile__foo__3126029035'});
+}`
+  );
+  t.deepEqual(selectorMap, {foo: 'jile__foo__6289739852701'});
 });
 
 test('if getNewline returns the correct number of newlines', (t) => {
@@ -156,22 +157,22 @@ test('if getNewline returns the correct number of newlines', (t) => {
 test('if getStandardBlockAndSelectorMap produces the correct css string and selector map when hashSelectors is false', (t) => {
   const selector = '.foo';
   const rule = {
-    display: 'block'
+    display: 'block',
   };
   const options = {
     hashSelectors: false,
-    id: 'bar'
+    id: 'bar',
   };
 
-  const {
-    css,
-    selectorMap
-  } = getStandardBlockAndSelectorMap(selector, rule, options, false);
+  const {css, selectorMap} = getStandardBlockAndSelectorMap(selector, rule, options, false);
 
-  t.is(css, `
+  t.is(
+    css,
+    `
 .foo {
   display: block;
-}`);
+}`
+  );
 
   t.deepEqual(selectorMap, {});
 });
@@ -179,24 +180,24 @@ test('if getStandardBlockAndSelectorMap produces the correct css string and sele
 test('if getStandardBlockAndSelectorMap produces the correct css string and selector map when hashSelectors is true', (t) => {
   const selector = '.foo';
   const rule = {
-    display: 'block'
+    display: 'block',
   };
   const options = {
     hashSelectors: true,
-    id: 'bar'
+    id: 'bar',
   };
 
-  const {
+  const {css, selectorMap} = getStandardBlockAndSelectorMap(selector, rule, options, false);
+
+  t.is(
     css,
-    selectorMap
-  } = getStandardBlockAndSelectorMap(selector, rule, options, false);
-
-  t.is(css, `
-.jile__foo__3126029035 {
+    `
+.jile__foo__6289739852701 {
   display: block;
-}`);
+}`
+  );
 
-  t.deepEqual(selectorMap, {foo: 'jile__foo__3126029035'});
+  t.deepEqual(selectorMap, {foo: 'jile__foo__6289739852701'});
 });
 
 test('if getVendorPrefix returns the corrent property based on original value', (t) => {

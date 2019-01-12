@@ -9,9 +9,7 @@ let prefixer = new Prefixer();
  *
  * @returns {string}
  */
-const getKeyframesPrefix = () => {
-  return prefixer.prefixedKeyframes;
-};
+export const getKeyframesPrefix = () => prefixer.prefixedKeyframes;
 
 /**
  * get styles with vendor-prefixed values
@@ -19,9 +17,7 @@ const getKeyframesPrefix = () => {
  * @param {object} styles
  * @returns {object}
  */
-const prefix = (styles) => {
-  return prefixer.prefix(styles);
-};
+export const prefix = (styles) => prefixer.prefix(styles);
 
 /**
  * set the prefixer based on userAgent and
@@ -31,10 +27,6 @@ const prefix = (styles) => {
  * @param {boolean} [options.keepUnprefixed]
  * @param {string} [options.userAgent]
  */
-const setPrefixerOptions = (options = {}) => {
+export const setPrefixerOptions = (options = {}) => {
   prefixer = new Prefixer(options);
 };
-
-export {getKeyframesPrefix};
-export {prefix};
-export {setPrefixerOptions};

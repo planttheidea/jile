@@ -1,19 +1,12 @@
-// is
-import {
-  isType
-} from './utils/is';
-
-// rules
-import {
-  getRuleType
-} from './utils/rules';
-
-// stylesheets
+// utils
+import {assign} from './utils/general';
+import {isType} from './utils/is';
+import {getRuleType} from './utils/rules';
 import {
   getKeyframesBlock,
   getMediaQueryBlockAndSelectorMap,
   getStandardBlockAndSelectorMap,
-  minify
+  minify,
 } from './utils/stylesheet';
 
 // constants {
@@ -21,10 +14,9 @@ import {
   FONT_FACE_REGEXP,
   KEYFRAMES_TYPE,
   MEDIA_QUERY_TYPE,
+} from './constants';
 
-  assign,
-  getOwnPropertyNames
-} from './utils/constants';
+const {getOwnPropertyNames} = Object;
 
 /**
  * build text content for injected style tag,
@@ -34,39 +26,44 @@ import {
  * @param {Object} options
  * @returns {{selectorMap: object, textContent: string}}
  */
-const getCssAndSelectorMap = (rules, options) => {
+export const getCssAndSelectorMap = (rules, options) => {
   const selectors = getOwnPropertyNames(rules);
 
   let selectorMap = {},
-      rule;
+      rule,
+      ruleType;
 
   let css = selectors.reduce((cssString, selector) => {
     rule = rules[selector];
 
-    switch (getRuleType(selector)) {
-      case KEYFRAMES_TYPE:
-        return `${cssString}${getKeyframesBlock(selector, rule, options, selectorMap)}`;
+    ruleType = getRuleType(selector);
 
-      case MEDIA_QUERY_TYPE:
-        const {
-          css: mediaQueryBlock,
-          selectorMap: mediaQuerySelectorMap
-        } = getMediaQueryBlockAndSelectorMap(selector, rule, options);
-
-        assign(selectorMap, mediaQuerySelectorMap);
-
-        return `${cssString}${mediaQueryBlock}`;
-
-      default:
-        const {
-          css: standardBlock,
-          selectorMap: standardSelectorMap
-        } = getStandardBlockAndSelectorMap(selector, rule, options, isType(FONT_FACE_REGEXP, selector));
-
-        assign(selectorMap, standardSelectorMap);
-
-        return `${cssString}${standardBlock}`;
+    if (ruleType === KEYFRAMES_TYPE) {
+      return `${cssString}${getKeyframesBlock(selector, rule, options, selectorMap)}`;
     }
+
+    if (ruleType === MEDIA_QUERY_TYPE) {
+      const {css: mediaQueryBlock, selectorMap: mediaQuerySelectorMap} = getMediaQueryBlockAndSelectorMap(
+        selector,
+        rule,
+        options
+      );
+
+      assign(selectorMap, mediaQuerySelectorMap);
+
+      return `${cssString}${mediaQueryBlock}`;
+    }
+
+    const {css: standardBlock, selectorMap: standardSelectorMap} = getStandardBlockAndSelectorMap(
+      selector,
+      rule,
+      options,
+      isType(FONT_FACE_REGEXP, selector)
+    );
+
+    assign(selectorMap, standardSelectorMap);
+
+    return `${cssString}${standardBlock}`;
   }, '');
 
   if (options.minify) {
@@ -75,8 +72,6 @@ const getCssAndSelectorMap = (rules, options) => {
 
   return {
     css,
-    selectorMap
+    selectorMap,
   };
 };
-
-export {getCssAndSelectorMap};

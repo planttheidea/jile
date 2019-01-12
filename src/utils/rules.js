@@ -1,20 +1,5 @@
 // external dependencies
-import isNAN from 'lodash/isNaN';
-import isPlainObject from 'lodash/isPlainObject';
 import merge from 'lodash/merge';
-
-// utils
-import {
-  getHashedValue
-} from './general';
-import {
-  isNestedProperty,
-  isType
-} from './is';
-import {
-  getKeyframesPrefix,
-  prefix
-} from './prefix';
 
 // constants
 import {
@@ -28,10 +13,24 @@ import {
   PAGE_REGEXP,
   PAGE_TYPE,
   STANDARD_TYPE,
+} from '../constants';
 
+// utils
+import {
   assign,
-  getOwnPropertyNames
-} from './constants';
+  getHashedValue,
+} from './general';
+import {
+  isNestedProperty,
+  isPlainObject,
+  isType,
+} from './is';
+import {
+  getKeyframesPrefix,
+  prefix,
+} from './prefix';
+
+const {getOwnPropertyNames} = Object;
 
 let keyframes = {};
 
@@ -44,20 +43,13 @@ let keyframes = {};
  * @param {Object} keyframesMap=keyframes
  * @returns {string}
  */
-const getChildAnimationName = (string, fieldToTest, keyframesMap = keyframes) => {
+export const getChildAnimationName = (string, fieldToTest, keyframesMap = keyframes) =>
   /**
    * if its already been hashed before, just return it
    */
-  if (isType(JILE_HASH_REGEXP, string)) {
-    return string;
-  }
-
-  const regexp = new RegExp(fieldToTest);
-
-  return string.replace(regexp, (value) => {
-    return keyframesMap[value] || value;
-  });
-};
+  isType(JILE_HASH_REGEXP, string)
+    ? string
+    : string.replace(new RegExp(fieldToTest), (value) => keyframesMap[value] || value);
 
 /**
  * get the cleaned animationName for the given object
@@ -67,14 +59,14 @@ const getChildAnimationName = (string, fieldToTest, keyframesMap = keyframes) =>
  * @param {Object} keyframesMap=keyframes
  * @returns {Object}
  */
-const getAnimationName = (object, property, keyframesMap = keyframes) => {
+export const getAnimationName = (object, property, keyframesMap = keyframes) => {
+  let animation;
+
   for (let keyframe in keyframesMap) {
-    const animation = getChildAnimationName(object[property], keyframe, keyframesMap);
+    animation = getChildAnimationName(object[property], keyframe, keyframesMap);
 
     if (object[property] !== animation) {
-      object = assign(object, {
-        animation
-      });
+      object = assign(object, {animation});
 
       break;
     }
@@ -89,16 +81,11 @@ const getAnimationName = (object, property, keyframesMap = keyframes) => {
  * @param {Object} rules
  * @returns {Object}
  */
-const getCleanRules = (rules) => {
-  const cleanRules = getOwnPropertyNames(rules).reduce((cleanValues, key) => {
-    if (!isPlainObject(rules[key])) {
-      return assign(cleanValues, {
-        [key]: rules[key]
-      });
-    }
-
-    return cleanValues;
-  }, {});
+export const getCleanRules = (rules) => {
+  const cleanRules = getOwnPropertyNames(rules).reduce(
+    (cleanValues, key) => (isPlainObject(rules[key]) ? cleanValues : assign(cleanValues, {[key]: rules[key]})),
+    {}
+  );
 
   return prefix(cleanRules);
 };
@@ -111,18 +98,16 @@ const getCleanRules = (rules) => {
  * @param {string} key
  * @returns {string}
  */
-const getFullKey = (root, key) => {
-  return `${root}${key.replace('&', '')}`;
-};
+export const getFullKey = (root, key) => `${root}${key.replace('&', '')}`;
 
 /**
  * get the keyframes prefix name
- * 
+ *
  * @param {string} key
  * @param {string} id
  * @returns {string}
  */
-const getKeyframesPrefixedDeclarataion = (key, id) => {
+export const getKeyframesPrefixedDeclarataion = (key, id) => {
   const keyframesPrefixedValue = `@${getKeyframesPrefix()}`;
 
   let cleanKey;
@@ -135,9 +120,7 @@ const getKeyframesPrefixedDeclarataion = (key, id) => {
 
       return value;
     })
-    .replace(KEYFRAMES_REGEXP, () => {
-      return keyframesPrefixedValue;
-    });
+    .replace(KEYFRAMES_REGEXP, () => keyframesPrefixedValue);
 };
 
 /**
@@ -149,23 +132,20 @@ const getKeyframesPrefixedDeclarataion = (key, id) => {
  * @param {string} id
  * @returns {Object}
  */
-const getKeyframeRules = (key, value, {id}) => {
+export const getKeyframeRules = (key, value, {id}) => {
+  const keyframeRules = getOwnPropertyNames(value).reduce((cleanValues, valueKey) => {
+    if (valueKey !== 'from' && valueKey !== 'to' && isNaN(parseInt(valueKey, 10))) {
+      throw new Error(
+        'The increment entered for the KEYFRAMES_REGEXP declaration is invalid, entries must either ' +
+          'be "from", "to", or a percentage.'
+      );
+    }
+
+    return merge(cleanValues, {[valueKey]: prefix(value[valueKey])});
+  }, {});
   const prefixedDeclaration = getKeyframesPrefixedDeclarataion(key, id);
 
-  const keyframeRules = getOwnPropertyNames(value).reduce((cleanValues, valueKey) => {
-    if (valueKey !== 'from' && valueKey !== 'to' && isNAN(parseInt(valueKey, 10))) {
-      throw new Error('The increment entered for the KEYFRAMES_REGEXP declaration is invalid, entries must either ' +
-        'be "from", "to", or a percentage.');
-    }
-    
-    return merge(cleanValues, {
-      [valueKey]: prefix(value[valueKey])
-    });
-  }, {});
-
-  return {
-    [prefixedDeclaration]: keyframeRules
-  };
+  return {[prefixedDeclaration]: keyframeRules};
 };
 
 /**
@@ -177,19 +157,15 @@ const getKeyframeRules = (key, value, {id}) => {
  * @param {string} root=''
  * @returns {Object}
  */
-const getMediaQueryRules = (value, {hashSelectors, id, root = ''}) => {
-  const styles = !root ? value : {
-    [root]: value
-  };
-  const newOptions = {
+export const getMediaQueryRules = (value, {hashSelectors, id, root = ''}) => {
+  const styles = root ? {[root]: value} : value;
+
+  // eslint-disable-next-line no-use-before-define
+  return getFlattenedRules(styles, {
     hashSelectors,
     id,
-    root: ''
-  };
-
-  /* eslint-disable no-use-before-define */
-  return getFlattenedRules(styles, newOptions);
-  /* eslint-enable */
+    root: '',
+  });
 };
 
 /**
@@ -198,7 +174,7 @@ const getMediaQueryRules = (value, {hashSelectors, id, root = ''}) => {
  * @param {string} key
  * @returns {string}
  */
-const getRuleType = (key) => {
+export const getRuleType = (key) => {
   if (isType(MEDIA_QUERY_REGEXP, key)) {
     return MEDIA_QUERY_TYPE;
   }
@@ -220,8 +196,8 @@ const getRuleType = (key) => {
  * @param {Object} object
  * @returns {Array<string>}
  */
-const getSortedKeys = (object) => {
-  return getOwnPropertyNames(object).sort((previousValue, currentValue) => {
+export const getSortedKeys = (object) =>
+  getOwnPropertyNames(object).sort((previousValue, currentValue) => {
     if (isType(KEYFRAMES_REGEXP, previousValue) || isType(FONT_FACE_REGEXP, previousValue)) {
       return -1;
     }
@@ -232,11 +208,10 @@ const getSortedKeys = (object) => {
 
     return 0;
   });
-};
 
 /**
  * get the standard rules for the object, as they are not an @ declaration
- * 
+ *
  * @param {Object} rules
  * @param {Object} child
  * @param {string} key
@@ -245,18 +220,15 @@ const getSortedKeys = (object) => {
  * @param {string} root
  * @returns {Object}
  */
-const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
-  const isKeyNestedProperty = isNestedProperty(key);
+export const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
   const isChildObject = isPlainObject(child);
 
-  if (!isKeyNestedProperty && !isChildObject) {
+  if (!isNestedProperty(key) && !isChildObject) {
     return rules;
   }
 
-  const fullKey = getFullKey(root, key);
-
   let newRules = merge(rules, {
-    [fullKey]: getCleanRules(child)
+    [getFullKey(root, key)]: getCleanRules(child),
   });
 
   if (!isChildObject) {
@@ -264,21 +236,19 @@ const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
   }
 
   return getOwnPropertyNames(child).reduce((rulesAcc, childKey) => {
-    if (isPlainObject(child[childKey])) {
-      const fullKey = getFullKey(root, key);
-
-      /* eslint-disable no-use-before-define */
-      const childRules = getFlattenedRules(child, {
-        hashSelectors,
-        id,
-        root: fullKey
-      });
-      /* eslint-enable */
-
-      return merge(rulesAcc, childRules);
+    if (!isPlainObject(child[childKey])) {
+      return rulesAcc;
     }
 
-    return rulesAcc;
+    return merge(
+      rulesAcc,
+      // eslint-disable-next-line no-use-before-define
+      getFlattenedRules(child, {
+        hashSelectors,
+        id,
+        root: getFullKey(root, key),
+      })
+    );
   }, newRules);
 };
 
@@ -288,32 +258,22 @@ const getStandardRules = (rules, child, key, {hashSelectors, id, root}) => {
  * @param {Object} rules
  * @returns {Object}
  */
-const getOnlyPopulatedRules = (rules) => {
-  return getOwnPropertyNames(rules).reduce((finalRules, key) => {
+export const getOnlyPopulatedRules = (rules) =>
+  getOwnPropertyNames(rules).reduce((finalRules, key) => {
     const value = rules[key];
 
-    if (!getOwnPropertyNames(value).length) {
-      return finalRules;
-    }
-
-    return assign(finalRules, {
-      [key]: value
-    });
+    return getOwnPropertyNames(value).length ? assign(finalRules, {[key]: value}) : finalRules;
   }, {});
-};
 
 /**
  * get the rules in a flattened format
- * 
+ *
  * @param {Object} styles
  * @param {{hashSelectors: boolean, id: string, root: string}} options
  * @returns {Object}
  */
-const getFlattenedRules = (styles, options) => {
-  const {
-    hashSelectors,
-    root = ''
-  } = options;
+export function getFlattenedRules(styles, options) {
+  const {hashSelectors, root = ''} = options;
 
   const flattenedRules = getSortedKeys(styles).reduce((rules, key) => {
     let child = styles[key];
@@ -331,7 +291,7 @@ const getFlattenedRules = (styles, options) => {
     switch (getRuleType(key)) {
       case MEDIA_QUERY_TYPE:
         return merge(rules, {
-          [key]: getMediaQueryRules(child, options)
+          [key]: getMediaQueryRules(child, options),
         });
 
       case KEYFRAMES_TYPE:
@@ -343,7 +303,7 @@ const getFlattenedRules = (styles, options) => {
         }
 
         return merge(rules, {
-          [key]: getCleanRules(child)
+          [key]: getCleanRules(child),
         });
 
       default:
@@ -352,17 +312,4 @@ const getFlattenedRules = (styles, options) => {
   }, {});
 
   return getOnlyPopulatedRules(flattenedRules);
-};
-
-export {keyframes};
-export {getAnimationName};
-export {getChildAnimationName};
-export {getCleanRules};
-export {getFlattenedRules};
-export {getFullKey};
-export {getKeyframesPrefixedDeclarataion};
-export {getKeyframeRules};
-export {getMediaQueryRules};
-export {getOnlyPopulatedRules};
-export {getRuleType};
-export {getSortedKeys};
+}

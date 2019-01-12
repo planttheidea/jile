@@ -1,6 +1,5 @@
 // external dependencies
 import hashIt from 'hash-it';
-import isUndefined from 'lodash/isUndefined';
 
 // constants
 import {
@@ -8,11 +7,25 @@ import {
   GLOBAL_REPLACEMENT_REGEXP,
   GLOBAL_SELECTOR_REGEXP,
   HASH_SELECTOR_REGEXP,
+} from '../constants';
 
-  assign
-} from './constants';
+// utils
+import {isPlainObject} from './is';
 
 let idCounter = 0;
+
+export const assign =
+  Object.assign
+  || ((target, ...sources) =>
+    sources.reduce((assigned, source) => {
+      if (!isPlainObject(source)) {
+        for (let key in source) {
+          assigned[key] = source[key];
+        }
+      }
+
+      return assigned;
+    }, target));
 
 /**
  * return the id passed or a generated one based on counter
@@ -20,9 +33,7 @@ let idCounter = 0;
  * @param {string} id
  * @returns {string}
  */
-const getGeneratedJileId = (id) => {
-  return !isUndefined(id) ? id : `jile-stylesheet-${idCounter++}`;
-};
+export const getGeneratedJileId = (id) => (id !== void 0 ? id : `jile-stylesheet-${idCounter++}`);
 
 /**
  * coalesce the options with default options and the generated id
@@ -30,13 +41,11 @@ const getGeneratedJileId = (id) => {
  * @param {Object} options
  * @returns {{autoMount: boolean, hashSelectors: boolean, id: string, minify: boolean}}
  */
-const getCleanOptions = (options = {}) => {
-  return {
-    ...DEFAULT_OPTIONS,
-    ...options,
-    id: getGeneratedJileId(options.id)
-  };
-};
+export const getCleanOptions = (options = {}) => ({
+  ...DEFAULT_OPTIONS,
+  ...options,
+  id: getGeneratedJileId(options.id),
+});
 
 /**
  * get the hashed key
@@ -45,11 +54,7 @@ const getCleanOptions = (options = {}) => {
  * @param {string} id
  * @returns {string}
  */
-const getHashedValue = (key, id) => {
-  const hashedValue = hashIt(`${key}-${id}`);
-
-  return `jile__${key}__${hashedValue}`;
-};
+export const getHashedValue = (key, id) => `jile__${key}__${hashIt(`${key}-${id}`)}`;
 
 /**
  * hash the selector, and add it to the hashmap if it does not exist
@@ -58,18 +63,21 @@ const getHashedValue = (key, id) => {
  * @param {string} id
  * @returns {string}
  */
-const getHashedSelector = (originalSelector, id) => {
+export const getHashedSelector = (originalSelector, id) => {
   let noHashValueMap = {},
       globalSelectorCounter = 0,
       selectorMap = {},
-      cleanSelector, mappedSelector, hashedSelector, key;
+      cleanSelector,
+      mappedSelector,
+      hashedSelector,
+      key;
 
   const selector = originalSelector
-    .replace(GLOBAL_SELECTOR_REGEXP, (match, value) => {
+    .replace(GLOBAL_SELECTOR_REGEXP, (matchIgnored, value) => {
       key = `global__${globalSelectorCounter}`;
 
       assign(noHashValueMap, {
-        [key]: value
+        [key]: value,
       });
 
       globalSelectorCounter++;
@@ -83,19 +91,17 @@ const getHashedSelector = (originalSelector, id) => {
 
       if (!mappedSelector) {
         assign(selectorMap, {
-          [cleanSelector]: hashedSelector
+          [cleanSelector]: hashedSelector,
         });
       }
 
       return `${value}${hashedSelector}`;
     })
-    .replace(GLOBAL_REPLACEMENT_REGEXP, (match) => {
-      return noHashValueMap[match];
-    });
+    .replace(GLOBAL_REPLACEMENT_REGEXP, (match) => noHashValueMap[match]);
 
   return {
     selector,
-    selectorMap
+    selectorMap,
   };
 };
 
@@ -105,17 +111,9 @@ const getHashedSelector = (originalSelector, id) => {
  * @param {string} string
  * @returns {string}
  */
-const toKebabCase = (string) => {
+export const toKebabCase = (string) => {
   // opera has precursor of capital O, so handle that scenario
-  if (string.charAt(0) === 'O') {
-    string = `o${string.slice(1)}`;
-  }
+  const stringToKebab = string.charAt(0) === 'O' ? `o${string.slice(1)}` : string;
 
-  return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  return stringToKebab.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 };
-
-export {getCleanOptions};
-export {getGeneratedJileId};
-export {getHashedSelector};
-export {getHashedValue};
-export {toKebabCase};

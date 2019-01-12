@@ -5,53 +5,33 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 module.exports = {
   devtool: '#source-map',
 
-  entry: [
-    path.resolve (__dirname, 'src', 'index.js')
-  ],
+  entry: [path.resolve(__dirname, 'src', 'index.js')],
 
-  eslint: {
-    configFile: '.eslintrc',
-    emitError: true,
-    failOnError: true,
-    failOnWarning: true,
-    formatter: require('eslint-friendly-formatter')
-  },
+  externals: ['hash-it', 'inline-style-prefixer'],
 
-  externals: {
-    'hash-it': {
-      amd: 'hash-it',
-      commonjs: 'hash-it',
-      commonjs2: 'hash-it',
-      root: 'hashIt'
-    },
-    'inline-style-prefixer': {
-      amd: 'inline-style-prefixer',
-      commonjs: 'inline-style-prefixer',
-      commonjs2: 'inline-style-prefixer',
-      root: 'Prefixer'
-    }
-  },
+  mode: 'development',
 
   module: {
-    preLoaders: [
+    rules: [
       {
-        include: [
-          /src/
-        ],
+        enforce: 'pre',
+        include: [path.join(__dirname, 'src')],
         loader: 'eslint-loader',
-        test: /\.js$/
-      }
-    ],
-
-    loaders: [
+        options: {
+          configFile: '.eslintrc',
+          emitError: true,
+          failOnError: true,
+          failOnWarning: false,
+          formatter: require('eslint-friendly-formatter'),
+        },
+        test: /\.js$/,
+      },
       {
-        include: [
-          /src/
-        ],
-        loader: 'babel',
-        test: /\.js?$/
-      }
-    ]
+        include: [path.join(__dirname, 'src'), path.join(__dirname, 'DEV_ONLY')],
+        loader: 'babel-loader',
+        test: /\.js?$/,
+      },
+    ],
   },
 
   output: {
@@ -59,22 +39,8 @@ module.exports = {
     library: 'jile',
     libraryTarget: 'umd',
     path: path.resolve(__dirname, 'dist'),
-    umdNamedDefine: true
+    umdNamedDefine: true,
   },
 
-  plugins: [
-    new webpack.EnvironmentPlugin([
-      'NODE_ENV'
-    ]),
-    new LodashModuleReplacementPlugin()
-  ],
-
-  resolve: {
-    extensions: [
-      '',
-      '.js'
-    ],
-
-    root: __dirname
-  }
+  plugins: [new webpack.EnvironmentPlugin(['NODE_ENV']), new LodashModuleReplacementPlugin()],
 };

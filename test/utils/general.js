@@ -5,12 +5,10 @@ import {
   getGeneratedJileId,
   getHashedSelector,
   getHashedValue,
-  toKebabCase
+  toKebabCase,
 } from 'src/utils/general';
 
-import {
-  DEFAULT_OPTIONS
-} from 'src/utils/constants';
+import {DEFAULT_OPTIONS} from 'src/constants';
 
 test('if getCleanOptions returns the default options and generated id if nothing passed', (t) => {
   const result = getCleanOptions();
@@ -27,7 +25,7 @@ test('if getCleanOptions returns the default options and generated id if nothing
 test('if getCleanOptions lets the passed options override the defaults', (t) => {
   const options = {
     autoMount: false,
-    hashSelectors: false
+    hashSelectors: false,
   };
   const result = getCleanOptions(options);
 
@@ -54,15 +52,12 @@ test('if getGeneratedJileId is in the format expected', (t) => {
 test('if getHashedSelector will only hash the correct selector values', (t) => {
   const id = 'foo';
 
-  const {
-    selector: simpleSelector,
-    selectorMap: simpleSelectorMap
-  } = getHashedSelector('.bar', id);
+  const {selector: simpleSelector, selectorMap: simpleSelectorMap} = getHashedSelector('.bar', id);
 
   t.regex(simpleSelector, /jile__bar__[0-9]/);
 
   t.deepEqual(simpleSelectorMap, {
-    bar: simpleSelector.slice(1)
+    bar: simpleSelector.slice(1),
   });
 });
 

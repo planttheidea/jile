@@ -6,7 +6,7 @@
  * @param {boolean} sourceMap
  * @returns {HTMLElement}
  */
-const getPopulatedTag = (css, id, {sourceMap}) => {
+export const getPopulatedTag = (css, id, {sourceMap}) => {
   if (!window || !document) {
     return null;
   }
@@ -15,7 +15,7 @@ const getPopulatedTag = (css, id, {sourceMap}) => {
 
   if (sourceMap) {
     const blob = new window.Blob([css], {
-      type: 'text/css'
+      type: 'text/css',
     });
 
     let link = existingTag || document.createElement('link');
@@ -37,5 +37,3 @@ const getPopulatedTag = (css, id, {sourceMap}) => {
 
   return style;
 };
-
-export {getPopulatedTag};

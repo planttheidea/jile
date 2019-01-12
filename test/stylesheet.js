@@ -1,12 +1,8 @@
 import test from 'ava';
 
-import {
-  getCssAndSelectorMap
-} from 'src/stylesheet';
+import {getCssAndSelectorMap} from 'src/stylesheet';
 
-import {
-  getHashedSelector
-} from 'src/utils/general';
+import {getHashedSelector} from 'src/utils/general';
 
 const ID = 'foo';
 const FOO = 'foo';
@@ -14,20 +10,20 @@ const BAR = 'bar';
 const rules = {
   [`@keyframes ${FOO}`]: {
     from: {
-      color: 'red'
+      color: 'red',
     },
     to: {
-      color: 'blue'
-    }
+      color: 'blue',
+    },
   },
   '@media screen and (min-width: 1000px)': {
     [`.${FOO}`]: {
-      display: 'block'
-    }
+      display: 'block',
+    },
   },
   [`.${BAR}`]: {
-    backgroundColor: 'white'
-  }
+    backgroundColor: 'white',
+  },
 };
 
 test('if getCssAndSelectorMap returns the css expected when not hashing selectors', (t) => {
@@ -36,7 +32,7 @@ test('if getCssAndSelectorMap returns the css expected when not hashing selector
     hashSelectors: false,
     id: ID,
     minify: false,
-    sourceMap: false
+    sourceMap: false,
   };
 
   const result = getCssAndSelectorMap(rules, options);
@@ -59,27 +55,23 @@ test('if getCssAndSelectorMap returns the css expected when not hashing selector
 .${BAR} {
   background-color: white;
 }`,
-    selectorMap: {}
+    selectorMap: {},
   });
 });
 
-test.only('if getCssAndSelectorMap returns the css expected when hashing selectors', (t) => {
+test('if getCssAndSelectorMap returns the css expected when hashing selectors', (t) => {
   const id = 'foo';
   const options = {
     autoMount: false,
     hashSelectors: true,
     id,
     minify: false,
-    sourceMap: false
+    sourceMap: false,
   };
 
   const result = getCssAndSelectorMap(rules, options);
-  const {
-    selector: hashedFoo
-  } = getHashedSelector(`.${FOO}`, ID);
-  const {
-    selector: hashedBar
-  } = getHashedSelector(`.${BAR}`, ID);
+  const {selector: hashedFoo} = getHashedSelector(`.${FOO}`, ID);
+  const {selector: hashedBar} = getHashedSelector(`.${BAR}`, ID);
 
   const css = `
 @keyframes ${hashedFoo.slice(1)} {
@@ -102,8 +94,8 @@ ${hashedBar} {
   t.deepEqual(result, {
     css,
     selectorMap: {
+      bar: hashedBar.slice(1),
       foo: hashedFoo.slice(1),
-      bar: hashedBar.slice(1)
-    }
+    },
   });
 });
